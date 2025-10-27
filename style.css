@@ -1,0 +1,42 @@
+body {
+  display: flex;
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+.sidebar {
+  width: 200px;
+  background-color: #111;
+  color: #fff;
+  height: 100vh;
+  padding: 20px;
+  position: fixed;
+}
+
+.sidebar h1 {
+  font-size: 24px;
+}
+
+.sidebar nav a {
+  display: block;
+  color: #fff;
+  margin: 15px 0;
+  text-decoration: none;
+}
+
+.sidebar nav a:hover {
+  text-decoration: underline;
+}
+
+.content {
+  margin-left: 220px;
+  padding: 40px;
+}
+
+section {
+  margin-bottom: 60px;
+}
+
+h2 {
+  margin-top: 0;
+}
