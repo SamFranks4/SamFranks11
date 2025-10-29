@@ -6,9 +6,8 @@
   <title>Edit Note</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    /* Body and layout */
     body {
-      background-color: #f5f5dc;
+      background: #f5f5dc;
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
@@ -17,9 +16,8 @@
       min-height: 100vh;
     }
 
-    /* Header */
     header {
-      background-color: #4F000B;
+      background: #4F000B;
       color: #f5f5dc;
       display: flex;
       justify-content: space-between;
@@ -42,7 +40,6 @@
       background: #4F000B;
     }
 
-    /* Main container */
     main {
       flex: 1;
       display: flex;
@@ -53,7 +50,6 @@
       padding: 1rem;
     }
 
-    /* Inputs */
     input, textarea, select {
       width: 100%;
       border: 1px solid #4F000B;
@@ -79,7 +75,6 @@
       font-size: 1rem;
     }
 
-    /* Save button */
     #saveNoteBtn {
       padding: 0.5rem 1rem;
       background-color: #4F000B;
@@ -105,30 +100,39 @@
   <main>
     <input type="text" id="noteTitleDisplay" placeholder="Note Title">
     <textarea id="noteContentDisplay" rows="10" placeholder="Write your note here..."></textarea>
-    <select id="noteCategorySelect">
-      <option value="personal">Personal</option>
-      <option value="work">Work</option>
-      <option value="coding">Coding</option>
-      <option value="cooking">Cooking</option>
-    </select>
+    <select id="noteCategorySelect"></select>
     <button id="saveNoteBtn">Save</button>
   </main>
 
   <script>
-    // Get the current note from LocalStorage
-    const currentNote = JSON.parse(localStorage.getItem('currentNote'));
+    // Grab notes and categories from LocalStorage
     const notes = JSON.parse(localStorage.getItem('notes')) || [];
+    const categories = JSON.parse(localStorage.getItem('categories')) || ['Home'];
+    const currentNote = JSON.parse(localStorage.getItem('currentNote'));
 
     const titleInput = document.getElementById('noteTitleDisplay');
     const contentInput = document.getElementById('noteContentDisplay');
     const categorySelect = document.getElementById('noteCategorySelect');
     const saveBtn = document.getElementById('saveNoteBtn');
 
+    // Populate category dropdown dynamically
+    function populateCategories() {
+      categorySelect.innerHTML = '';
+      categories.forEach(cat => {
+        const opt = document.createElement('option');
+        opt.value = cat;
+        opt.textContent = cat;
+        categorySelect.appendChild(opt);
+      });
+    }
+
+    populateCategories();
+
     // Pre-fill inputs with current note data
     if (currentNote) {
       titleInput.value = currentNote.title;
       contentInput.value = currentNote.content;
-      categorySelect.value = currentNote.category || 'personal';
+      categorySelect.value = currentNote.category || 'Home';
     }
 
     // Save changes
@@ -139,7 +143,6 @@
         category: categorySelect.value
       };
 
-      // Find and update the note in the notes array
       const noteIndex = notes.findIndex(n => 
         n.title === currentNote.title &&
         n.content === currentNote.content &&
@@ -150,7 +153,6 @@
         notes[noteIndex] = updatedNote;
       }
 
-      // Update LocalStorage
       localStorage.setItem('notes', JSON.stringify(notes));
       localStorage.setItem('currentNote', JSON.stringify(updatedNote));
 
@@ -158,4 +160,5 @@
     });
   </script>
 </body>
+</html>
 </html>
