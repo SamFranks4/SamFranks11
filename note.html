@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Note</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1 id="noteTitleDisplay">Note</h1>
+    <a href="index.html" style="color:#f5f5dc;text-decoration:none;">← Back</a>
+  </header>
+  <main>
+    <p id="noteContentDisplay"></p>
+  </main>
+
+  <script>
+    // Load the clicked note from LocalStorage
+    const noteData = JSON.parse(localStorage.getItem('currentNote'));
+    if (noteData) {
+      document.getElementById('noteTitleDisplay').innerText = noteData.title;
+      document.getElementById('noteContentDisplay').innerText = noteData.content;
+    }
+  </script>
+</body>
+</html>
