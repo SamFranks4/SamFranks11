@@ -11,6 +11,13 @@ const categories = document.querySelectorAll('#categories li');
 
 let notes = [];
 
+// Load notes from localStorage if they exist
+const savedNotes = localStorage.getItem('notes');
+if (savedNotes) {
+  notes = JSON.parse(savedNotes);
+  renderNotes();
+}
+
 // Open modal
 addNoteBtn.addEventListener('click', () => {
   noteModal.style.display = 'flex';
@@ -28,7 +35,12 @@ saveNoteBtn.addEventListener('click', () => {
     content: noteContent.value,
     category: noteCategory.value
   };
+  
   notes.push(note);
+  
+  // Save to localStorage
+  localStorage.setItem('notes', JSON.stringify(notes));
+  
   renderNotes();
   noteModal.style.display = 'none';
   noteTitle.value = '';
@@ -42,11 +54,26 @@ function renderNotes(filterCategory = 'all') {
   notes.filter(note => {
     return (filterCategory === 'all' || note.category === filterCategory) &&
            (note.title.toLowerCase().includes(searchTerm) || note.content.toLowerCase().includes(searchTerm));
-  }).forEach(note => {
+  }).forEach((note, index) => {
     const div = document.createElement('div');
     div.className = 'note';
-    div.innerHTML = `<h3>${note.title}</h3><p>${note.content}</p>`;
+    div.innerHTML = `
+      <h3>${note.title}</h3>
+      <p>${note.content}</p>
+      <button class="deleteBtn" data-index="${index}">Delete</button>
+    `;
     notesList.appendChild(div);
+  });
+
+  // Add delete functionality
+  const deleteButtons = document.querySelectorAll('.deleteBtn');
+  deleteButtons.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const idx = e.target.dataset.index;
+      notes.splice(idx, 1);
+      localStorage.setItem('notes', JSON.stringify(notes));
+      renderNotes(document.querySelector('#categories li.active').dataset.category);
+    });
   });
 }
 
