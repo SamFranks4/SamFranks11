@@ -7,124 +7,69 @@
   <link rel="stylesheet" href="style.css">
   <style>
     body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f5f5dc;
       display: flex;
       flex-direction: column;
-      height: 100vh;
-      background: #f5f5dc;
-      margin: 0;
-      font-family: Arial, sans-serif;
+      min-height: 100vh;
     }
 
     header {
-      display: flex;
-      align-items: center;
-      padding: 1rem;
       background: #4F000B;
       color: #f5f5dc;
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
     }
 
-    header h1 {
-      flex: 1;
+    #returnHomeBtn {
+      background: #720026;
+      color: #f5f5dc;
+      border: none;
+      border-radius: 5px;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+    }
+
+    #returnHomeBtn:hover {
+      background: #4F000B;
     }
 
     main {
       flex: 1;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      padding: 2rem;
-    }
-
-    #editNoteArea {
-      width: 90%;
-      max-width: 800px;
-      background: #fff;
-      border-left: 5px solid #4F000B;
-      border-radius: 5px;
-      padding: 2rem;
+      padding: 1rem;
       display: flex;
       flex-direction: column;
       gap: 1rem;
-      box-shadow: 0 0 10px rgba(79, 0, 11, 0.3);
     }
 
-    #editNoteArea input {
-      font-size: 1.5rem;
-      font-weight: bold;
-      border: none;
-      outline: none;
-    }
-
-    #editNoteArea textarea {
-      flex: 1;
-      border: none;
-      outline: none;
-      resize: vertical;
-      min-height: 300px;
+    #noteTitle, #noteContent {
+      width: 100%;
+      padding: 0.5rem;
+      border-radius: 5px;
+      border: 1px solid #4F000B;
       font-size: 1rem;
-      line-height: 1.5rem;
     }
 
-    #status {
-      font-size: 0.9rem;
-      color: #720026;
-      text-align: right;
+    #noteContent {
+      min-height: 300px;
+      resize: vertical;
     }
   </style>
 </head>
 <body>
   <header>
-    <h1>Edit Note</h1>
+    <button id="returnHomeBtn">← Home</button>
   </header>
 
   <main>
-    <div id="editNoteArea">
-      <input type="text" id="noteTitle" placeholder="Title">
-      <textarea id="noteContent" placeholder="Content"></textarea>
-      <div id="status">All changes saved.</div>
-    </div>
+    <input type="text" id="noteTitle" placeholder="Title">
+    <textarea id="noteContent" placeholder="Content"></textarea>
   </main>
 
-  <script>
-    const noteTitleInput = document.getElementById("noteTitle");
-    const noteContentInput = document.getElementById("noteContent");
-    const status = document.getElementById("status");
-
-    let currentNote = JSON.parse(localStorage.getItem("currentNote"));
-
-    if (currentNote) {
-      noteTitleInput.value = currentNote.title;
-      noteContentInput.value = currentNote.content;
-    }
-
-    function saveNote() {
-      if (!currentNote) return;
-
-      let notes = JSON.parse(localStorage.getItem("notes")) || [];
-      const noteIndex = notes.findIndex(n => n.title === currentNote.title && n.content === currentNote.content && n.category === currentNote.category);
-
-      if (noteIndex > -1) {
-        notes[noteIndex].title = noteTitleInput.value;
-        notes[noteIndex].content = noteContentInput.value;
-        localStorage.setItem("notes", JSON.stringify(notes));
-
-        currentNote = notes[noteIndex];
-        localStorage.setItem("currentNote", JSON.stringify(currentNote));
-
-        status.textContent = "All changes saved.";
-      }
-    }
-
-    // Auto-save on input
-    noteTitleInput.addEventListener("input", () => {
-      status.textContent = "Saving...";
-      saveNote();
-    });
-
-    noteContentInput.addEventListener("input", () => {
-      status.textContent = "Saving...";
-      saveNote();
-    });
-  </script>
+  <script src="note.js"></script>
 </body>
 </html>
