@@ -65,21 +65,18 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Make sure the add category button works
-  function attachAddCategoryListener() {
-    if (!addCategoryBtn) return;
-    addCategoryBtn.addEventListener("click", e => {
-      e.preventDefault();
-      const newCat = newCategoryInput.value.trim();
-      if (newCat && !categories.includes(newCat)) {
-        categories.push(newCat);
-        localStorage.setItem("categories", JSON.stringify(categories));
-        newCategoryInput.value = "";
-        renderCategories();
-        updateModalCategories();
-      }
-    });
-  }
+  // === ADD CATEGORY ===
+  addCategoryBtn.addEventListener("click", e => {
+    e.preventDefault();
+    const newCat = newCategoryInput.value.trim();
+    if (newCat && !categories.includes(newCat)) {
+      categories.push(newCat);
+      localStorage.setItem("categories", JSON.stringify(categories));
+      newCategoryInput.value = "";
+      renderCategories();
+      updateModalCategories();
+    }
+  });
 
   // === NOTES FUNCTIONS ===
   addNoteBtn.addEventListener("click", () => {
@@ -131,7 +128,7 @@ document.addEventListener("DOMContentLoaded", () => {
         div.addEventListener("click", e => {
           if (!e.target.classList.contains("deleteBtn")) {
             localStorage.setItem("currentNote", JSON.stringify(note));
-            window.location.href = "note.html"; // new editable page
+            window.location.href = "note.html";
           }
         });
       });
@@ -152,5 +149,4 @@ document.addEventListener("DOMContentLoaded", () => {
   renderCategories();
   updateModalCategories();
   renderNotes();
-  attachAddCategoryListener();
 });
