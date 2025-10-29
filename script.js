@@ -11,7 +11,7 @@ const categories = document.querySelectorAll('#categories li');
 
 let notes = [];
 
-// Load notes from localStorage if they exist
+// Load notes from localStorage
 const savedNotes = localStorage.getItem('notes');
 if (savedNotes) {
   notes = JSON.parse(savedNotes);
@@ -60,12 +60,12 @@ function renderNotes(filterCategory = 'all') {
     div.innerHTML = `
       <h3>${note.title}</h3>
       <p>${note.content}</p>
-      <button class="deleteBtn" data-index="${index}">Delete</button>
+      <button class="deleteBtn" data-index="${index}">×</button>
     `;
     notesList.appendChild(div);
   });
 
-  // Add delete functionality
+  // Delete note functionality
   const deleteButtons = document.querySelectorAll('.deleteBtn');
   deleteButtons.forEach(btn => {
     btn.addEventListener('click', (e) => {
