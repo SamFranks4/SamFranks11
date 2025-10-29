@@ -14,8 +14,8 @@ header {
   gap: 0.5rem;
 }
 
-header input {
-  flex: 2;
+header input, header select {
+  flex: 1;
   padding: 0.5rem;
   border-radius: 5px;
   border: none;
@@ -40,7 +40,7 @@ header button:hover {
 }
 
 aside {
-  width: 180px;
+  width: 200px;
   background: #4F000B;
   color: #f5f5dc;
   padding: 1rem;
@@ -53,7 +53,7 @@ aside {
 
 #categoryList li {
   padding: 0.5rem;
-  cursor: pointer;
+  cursor: grab;
   border-radius: 4px;
   margin-bottom: 0.3rem;
   display: flex;
