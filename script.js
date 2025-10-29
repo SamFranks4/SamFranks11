@@ -12,12 +12,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const searchBar = document.getElementById("searchBar");
   const categoryListUL = document.getElementById("categoryList");
   const addCategoryBtn = document.getElementById("addCategoryBtn");
+  const filterPinned = document.getElementById("filterPinned");
 
   let notes = JSON.parse(localStorage.getItem("notes")) || [];
   let categories = JSON.parse(localStorage.getItem("categories")) || ["Home"];
+  let categoryColors = JSON.parse(localStorage.getItem("categoryColors")) || {"Home": "#4F000B"};
   let activeCategory = "Home";
 
-  // === CATEGORY FUNCTIONS ===
   function updateModalCategories() {
     noteCategorySelect.innerHTML = "";
     categories.forEach(cat => {
@@ -30,15 +31,30 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function renderCategories() {
     categoryListUL.innerHTML = "";
-    categories.forEach(cat => {
+    categories.forEach((cat, idx) => {
       const li = document.createElement("li");
       li.textContent = cat;
+      li.style.borderLeft = `5px solid ${categoryColors[cat] || "#720026"}`;
       if (cat === activeCategory) li.classList.add("active");
+      li.draggable = true;
 
       li.addEventListener("click", () => {
         activeCategory = cat;
         renderCategories();
         renderNotes();
+      });
+
+      li.addEventListener("dragstart", e => {
+        e.dataTransfer.setData("text/plain", idx);
+      });
+
+      li.addEventListener("dragover", e => e.preventDefault());
+      li.addEventListener("drop", e => {
+        e.preventDefault();
+        const fromIdx = e.dataTransfer.getData("text/plain");
+        categories.splice(idx, 0, categories.splice(fromIdx,1)[0]);
+        localStorage.setItem("categories", JSON.stringify(categories));
+        renderCategories();
       });
 
       categoryListUL.appendChild(li);
@@ -49,13 +65,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const newCat = prompt("Enter category name:").trim();
     if (newCat && !categories.includes(newCat)) {
       categories.push(newCat);
+      categoryColors[newCat] = "#720026";
       localStorage.setItem("categories", JSON.stringify(categories));
+      localStorage.setItem("categoryColors", JSON.stringify(categoryColors));
       renderCategories();
       updateModalCategories();
     }
   });
 
-  // === NOTES FUNCTIONS ===
   addNoteBtn.addEventListener("click", () => {
     noteModal.style.display = "flex";
     updateModalCategories();
@@ -74,7 +91,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const note = {
       title: noteTitle.value.trim(),
       content: noteContent.innerHTML.trim(),
-      tags: noteTags.value.split(",").map(t => t.trim()).filter(Boolean),
+      tags: noteTags.value.split(",").map(t=>t.trim()).filter(Boolean),
       pinned: notePinned.checked,
       category: noteCategorySelect.value
     };
@@ -86,41 +103,4 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   function renderNotes() {
-    const searchTerm = searchBar.value.toLowerCase();
-    notesList.innerHTML = "";
-    const sortedNotes = [...notes].sort((a,b) => b.pinned - a.pinned); // pinned first
-    sortedNotes
-      .filter(note =>
-        (activeCategory === "Home" || note.category === activeCategory) &&
-        (note.title.toLowerCase().includes(searchTerm) ||
-         note.content.toLowerCase().includes(searchTerm) ||
-         note.tags.join(" ").toLowerCase().includes(searchTerm))
-      )
-      .forEach((note, index) => {
-        const div = document.createElement("div");
-        div.className = "note";
-        div.innerHTML = `
-          ${note.pinned ? '<div class="pinned">📌 Pinned</div>' : ''}
-          <h3>${note.title}</h3>
-          <div class="tags">${note.tags.join(", ")}</div>
-          <div class="noteContent">${note.content}</div>
-          <button class="deleteBtn" data-index="${index}">×</button>
-        `;
-        notesList.appendChild(div);
-
-        div.querySelector(".deleteBtn").addEventListener("click", e => {
-          e.stopPropagation();
-          if (confirm("Are you sure you want to delete this note?")) {
-            notes.splice(index, 1);
-            localStorage.setItem("notes", JSON.stringify(notes));
-            renderNotes();
-          }
-        });
-      });
-  }
-
-  searchBar.addEventListener("input", renderNotes);
-  renderCategories();
-  updateModalCategories();
-  renderNotes();
-});
+    const searchTerm = searchBar.value
