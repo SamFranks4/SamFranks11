@@ -1,145 +1,100 @@
-const addNoteBtn = document.getElementById("addNoteBtn");
-const addCategoryBtn = document.getElementById("addCategoryBtn");
-const homeBtn = document.getElementById("homeBtn");
-const noteModal = document.getElementById("noteModal");
-const categoryModal = document.getElementById("categoryModal");
-const closeNoteModal = document.querySelector(".close");
-const closeCatModal = document.querySelector(".catClose");
-const saveNoteBtn = document.getElementById("saveNoteBtn");
-const saveCategoryBtn = document.getElementById("saveCategoryBtn");
-const noteTitle = document.getElementById("noteTitle");
-const noteContent = document.getElementById("noteContent");
-const noteCategory = document.getElementById("noteCategory");
-const notesList = document.getElementById("notesList");
-const categoryList = document.getElementById("categoryList");
-const newCategoryInput = document.getElementById("newCategoryInput");
-const searchBar = document.getElementById("searchBar");
+document.addEventListener("DOMContentLoaded", () => {
+  const notesList = document.getElementById("notesList");
+  const addNoteBtn = document.getElementById("addNoteBtn");
+  const noteModal = document.getElementById("noteModal");
+  const closeModal = document.querySelector(".close");
+  const saveNoteBtn = document.getElementById("saveNoteBtn");
+  const noteTitle = document.getElementById("noteTitle");
+  const noteContent = document.getElementById("noteContent");
+  const noteCategorySelect = document.getElementById("noteCategory");
+  const searchBar = document.getElementById("searchBar");
+  const categoryListUL = document.getElementById("categoryList");
+  const addCategoryBtn = document.getElementById("addCategoryBtn");
 
-let notes = JSON.parse(localStorage.getItem("notes")) || [];
-let categories = JSON.parse(localStorage.getItem("categories")) || ["Home"];
-let currentCategory = "Home";
+  let notes = JSON.parse(localStorage.getItem("notes")) || [];
+  let categories = JSON.parse(localStorage.getItem("categories")) || ["Home"];
+  let activeCategory = "Home";
 
-/* ====== RENDER FUNCTIONS ====== */
-function renderCategories() {
-  categoryList.innerHTML = "";
-  categories.forEach((cat) => {
-    const li = document.createElement("li");
-    li.textContent = cat;
-    if (cat === currentCategory) li.classList.add("active");
+  function updateModalCategories() {
+    noteCategorySelect.innerHTML = "";
+    categories.forEach(cat => {
+      const opt = document.createElement("option");
+      opt.value = cat;
+      opt.textContent = cat;
+      noteCategorySelect.appendChild(opt);
+    });
+  }
 
-    const delBtn = document.createElement("button");
-    delBtn.textContent = "×";
-    delBtn.classList.add("deleteCatBtn");
-    delBtn.onclick = (e) => {
-      e.stopPropagation();
-      if (confirm(`Are you sure you want to delete category "${cat}"?`)) {
-        categories = categories.filter((c) => c !== cat);
-        localStorage.setItem("categories", JSON.stringify(categories));
-        if (currentCategory === cat) currentCategory = "Home";
+  function renderCategories() {
+    categoryListUL.innerHTML = "";
+    categories.forEach(cat => {
+      const li = document.createElement("li");
+      li.textContent = cat;
+      if (cat === activeCategory) li.classList.add("active");
+      li.addEventListener("click", () => {
+        activeCategory = cat;
         renderCategories();
         renderNotes();
-      }
-    };
+      });
+      categoryListUL.appendChild(li);
+    });
+  }
 
-    li.onclick = () => {
-      currentCategory = cat;
+  function renderNotes() {
+    const searchTerm = searchBar.value.toLowerCase();
+    notesList.innerHTML = "";
+    notes
+      .filter(note => activeCategory === "Home" || note.category === activeCategory)
+      .filter(note => note.title.toLowerCase().includes(searchTerm) || note.content.toLowerCase().includes(searchTerm))
+      .forEach(note => {
+        const div = document.createElement("div");
+        div.className = "note";
+        div.innerHTML = `<h3>${note.title}</h3><p>${note.content}</p>`;
+        notesList.appendChild(div);
+
+        div.addEventListener("click", () => {
+          localStorage.setItem("currentNoteId", note.id);
+          window.location.href = "note.html";
+        });
+      });
+  }
+
+  addNoteBtn.addEventListener("click", () => {
+    noteModal.style.display = "flex";
+    updateModalCategories();
+    noteCategorySelect.value = activeCategory;
+  });
+
+  closeModal.addEventListener("click", () => noteModal.style.display = "none");
+
+  saveNoteBtn.addEventListener("click", () => {
+    const title = noteTitle.value.trim();
+    const content = noteContent.value.trim();
+    const category = noteCategorySelect.value;
+
+    if (!title && !content) return;
+
+    const newNote = { id: Date.now(), title, content, category };
+    notes.push(newNote);
+    localStorage.setItem("notes", JSON.stringify(notes));
+    renderNotes();
+    noteModal.style.display = "none";
+    noteTitle.value = "";
+    noteContent.value = "";
+  });
+
+  searchBar.addEventListener("input", renderNotes);
+
+  addCategoryBtn.addEventListener("click", () => {
+    const newCat = prompt("Enter new category:");
+    if (newCat && !categories.includes(newCat)) {
+      categories.push(newCat);
+      localStorage.setItem("categories", JSON.stringify(categories));
       renderCategories();
-      renderNotes();
-      homeBtn.style.display = cat !== "Home" ? "inline-block" : "none";
-    };
-
-    li.appendChild(delBtn);
-    categoryList.appendChild(li);
+    }
   });
-  localStorage.setItem("categories", JSON.stringify(categories));
-}
 
-function renderNotes() {
-  notesList.innerHTML = "";
-  let filtered = notes.filter(
-    (n) =>
-      (currentCategory === "Home" || n.category === currentCategory) &&
-      n.title.toLowerCase().includes(searchBar.value.toLowerCase())
-  );
-
-  filtered.forEach((note) => {
-    const div = document.createElement("div");
-    div.classList.add("note");
-    div.innerHTML = `<h3>${note.title}</h3><p>${note.content}</p>`;
-
-    const delBtn = document.createElement("button");
-    delBtn.textContent = "×";
-    delBtn.classList.add("deleteBtn");
-    delBtn.onclick = (e) => {
-      e.stopPropagation();
-      if (confirm(`Are you sure you want to delete note "${note.title}"?`)) {
-        notes = notes.filter((n) => n !== note);
-        localStorage.setItem("notes", JSON.stringify(notes));
-        renderNotes();
-      }
-    };
-
-    div.appendChild(delBtn);
-    notesList.appendChild(div);
-  });
-}
-
-/* ====== MODALS ====== */
-addNoteBtn.onclick = () => {
-  noteModal.style.display = "flex";
-  noteTitle.value = "";
-  noteContent.value = "";
-  noteCategory.innerHTML = categories.map(
-    (c) => `<option value="${c}">${c}</option>`
-  ).join("");
-};
-
-addCategoryBtn.onclick = () => {
-  categoryModal.style.display = "flex";
-  newCategoryInput.value = "";
-};
-
-closeNoteModal.onclick = () => (noteModal.style.display = "none");
-closeCatModal.onclick = () => (categoryModal.style.display = "none");
-
-window.onclick = (e) => {
-  if (e.target === noteModal) noteModal.style.display = "none";
-  if (e.target === categoryModal) categoryModal.style.display = "none";
-};
-
-saveNoteBtn.onclick = () => {
-  const note = {
-    title: noteTitle.value.trim(),
-    content: noteContent.value.trim(),
-    category: noteCategory.value,
-  };
-  if (!note.title || !note.content) return alert("Please fill out all fields");
-  notes.push(note);
-  localStorage.setItem("notes", JSON.stringify(notes));
-  renderNotes();
-  noteModal.style.display = "none";
-};
-
-saveCategoryBtn.onclick = () => {
-  const cat = newCategoryInput.value.trim();
-  if (!cat) return alert("Enter a category name");
-  if (categories.includes(cat)) return alert("Category already exists");
-  categories.push(cat);
   renderCategories();
-  categoryModal.style.display = "none";
-};
-
-/* ====== SEARCH BAR ====== */
-searchBar.oninput = () => renderNotes();
-
-/* ====== HOME BUTTON ====== */
-homeBtn.onclick = () => {
-  currentCategory = "Home";
-  renderCategories();
+  updateModalCategories();
   renderNotes();
-  homeBtn.style.display = "none";
-};
-
-/* ====== INIT ====== */
-renderCategories();
-renderNotes();
+});
