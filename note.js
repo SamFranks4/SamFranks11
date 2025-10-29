@@ -1,42 +1,38 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const noteTitleInput = document.getElementById("noteTitleEditable");
-  const noteContentDiv = document.getElementById("noteContentEditable");
-  const saveBtn = document.getElementById("saveBtn");
-  const backBtn = document.getElementById("backBtn");
+  const noteTitle = document.getElementById("noteTitle");
+  const noteContent = document.getElementById("noteContent");
+  const returnHomeBtn = document.getElementById("returnHomeBtn");
 
-  let currentNote = JSON.parse(localStorage.getItem("currentNote")) || null;
-  let notes = JSON.parse(localStorage.getItem("notes")) || [];
+  // Load current note from localStorage
+  const currentNote = JSON.parse(localStorage.getItem("currentNote")) || { title: "", content: "" };
+  noteTitle.value = currentNote.title;
+  noteContent.value = currentNote.content;
 
-  if (!currentNote) {
-    alert("No note selected!");
-    window.location.href = "index.html";
-    return;
-  }
+  // Auto-save changes
+  function saveNote() {
+    const notes = JSON.parse(localStorage.getItem("notes")) || [];
+    const index = notes.findIndex(n => n.title === currentNote.title && n.content === currentNote.content);
 
-  noteTitleInput.value = currentNote.title;
-  noteContentDiv.textContent = currentNote.content;
-
-  saveBtn.addEventListener("click", () => {
-    currentNote.title = noteTitleInput.value.trim();
-    currentNote.content = noteContentDiv.textContent.trim();
-
-    // Update the note in the notes array
-    const index = notes.findIndex(
-      n => n.title === currentNote.title && n.category === currentNote.category
-    );
-
-    if (index !== -1) {
-      notes[index] = currentNote;
+    if (index > -1) {
+      notes[index] = {
+        ...notes[index],
+        title: noteTitle.value,
+        content: noteContent.value
+      };
     } else {
-      notes.push(currentNote); // fallback
+      // If somehow note doesn't exist, add it
+      notes.push({ title: noteTitle.value, content: noteContent.value, category: currentNote.category || "Home" });
     }
 
     localStorage.setItem("notes", JSON.stringify(notes));
-    alert("Note saved!");
-  });
+  }
 
-  backBtn.addEventListener("click", () => {
-    localStorage.removeItem("currentNote");
+  noteTitle.addEventListener("input", saveNote);
+  noteContent.addEventListener("input", saveNote);
+
+  // Return to homepage
+  returnHomeBtn.addEventListener("click", () => {
+    saveNote(); // ensure changes saved
     window.location.href = "index.html";
   });
 });
