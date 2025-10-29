@@ -97,3 +97,8 @@ categories.forEach(cat => {
     renderNotes(cat.dataset.category);
   });
 });
+
+// Re-render notes whenever the page gains focus (like returning from note.html)
+window.addEventListener('focus', () => {
+  renderNotes(document.querySelector('#categories li.active').dataset.category);
+});
