@@ -11,7 +11,7 @@ const categories = document.querySelectorAll('#categories li');
 
 let notes = [];
 
-// Load notes from LocalStorage
+// Load notes
 const savedNotes = localStorage.getItem('notes');
 if (savedNotes) {
   notes = JSON.parse(savedNotes);
@@ -28,17 +28,15 @@ closeModal.addEventListener('click', () => {
   noteModal.style.display = 'none';
 });
 
-// Save note
+// Save new note
 saveNoteBtn.addEventListener('click', () => {
   const note = {
     title: noteTitle.value,
     content: noteContent.value,
     category: noteCategory.value
   };
-  
   notes.push(note);
   localStorage.setItem('notes', JSON.stringify(notes));
-  
   renderNotes();
   noteModal.style.display = 'none';
   noteTitle.value = '';
@@ -49,56 +47,50 @@ saveNoteBtn.addEventListener('click', () => {
 function renderNotes(filterCategory = 'all') {
   const searchTerm = searchBar.value.toLowerCase();
   notesList.innerHTML = '';
-  notes.filter(note => {
-    return (filterCategory === 'all' || note.category === filterCategory) &&
-           (note.title.toLowerCase().includes(searchTerm) || note.content.toLowerCase().includes(searchTerm));
-  }).forEach((note, index) => {
-    const div = document.createElement('div');
-    div.className = 'note';
-    div.innerHTML = `
-      <h3>${note.title}</h3>
-      <p>${note.content}</p>
-      <button class="deleteBtn" data-index="${index}">×</button>
-    `;
+  notes.filter(note => (filterCategory==='all'||note.category===filterCategory) && 
+                      (note.title.toLowerCase().includes(searchTerm)||note.content.toLowerCase().includes(searchTerm)))
+       .forEach((note,index)=>{
+    const div=document.createElement('div');
+    div.className='note';
+    div.innerHTML=`<h3>${note.title}</h3><p>${note.content}</p><button class="deleteBtn" data-index="${index}">×</button>`;
     notesList.appendChild(div);
 
-    // Click note to open edit page
-    div.addEventListener('click', (e) => {
-      if (!e.target.classList.contains('deleteBtn')) {
-        localStorage.setItem('currentNote', JSON.stringify(note));
-        window.location.href = 'note.html';
+    div.addEventListener('click',(e)=>{
+      if(!e.target.classList.contains('deleteBtn')){
+        localStorage.setItem('currentNote',JSON.stringify(note));
+        window.location.href='note.html';
       }
     });
   });
 
-  // Delete note
-  const deleteButtons = document.querySelectorAll('.deleteBtn');
-  deleteButtons.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const idx = e.target.dataset.index;
-      notes.splice(idx, 1);
-      localStorage.setItem('notes', JSON.stringify(notes));
+  // Delete
+  const deleteButtons=document.querySelectorAll('.deleteBtn');
+  deleteButtons.forEach(btn=>{
+    btn.addEventListener('click',(e)=>{
+      const idx=e.target.dataset.index;
+      notes.splice(idx,1);
+      localStorage.setItem('notes',JSON.stringify(notes));
       renderNotes(document.querySelector('#categories li.active').dataset.category);
     });
   });
 }
 
-// Search notes
-searchBar.addEventListener('input', () => {
-  const activeCategory = document.querySelector('#categories li.active').dataset.category;
+// Search
+searchBar.addEventListener('input',()=>{
+  const activeCategory=document.querySelector('#categories li.active').dataset.category;
   renderNotes(activeCategory);
 });
 
-// Filter by category
-categories.forEach(cat => {
-  cat.addEventListener('click', () => {
-    categories.forEach(c => c.classList.remove('active'));
+// Filter
+categories.forEach(cat=>{
+  cat.addEventListener('click',()=>{
+    categories.forEach(c=>c.classList.remove('active'));
     cat.classList.add('active');
     renderNotes(cat.dataset.category);
   });
 });
 
-// Re-render notes whenever the page gains focus (like returning from note.html)
-window.addEventListener('focus', () => {
+// Update when returning from note page
+window.addEventListener('focus',()=>{
   renderNotes(document.querySelector('#categories li.active').dataset.category);
 });
