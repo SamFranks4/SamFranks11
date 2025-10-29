@@ -1,38 +1,40 @@
 document.addEventListener("DOMContentLoaded", () => {
   const noteTitle = document.getElementById("noteTitle");
   const noteContent = document.getElementById("noteContent");
+  const noteCategory = document.getElementById("noteCategory");
+  const saveNoteBtn = document.getElementById("saveNoteBtn");
   const returnHomeBtn = document.getElementById("returnHomeBtn");
 
-  // Load current note from localStorage
-  const currentNote = JSON.parse(localStorage.getItem("currentNote")) || { title: "", content: "" };
-  noteTitle.value = currentNote.title;
-  noteContent.value = currentNote.content;
+  let notes = JSON.parse(localStorage.getItem("notes")) || [];
+  let categories = JSON.parse(localStorage.getItem("categories")) || ["Home"];
+  const currentNoteId = parseInt(localStorage.getItem("currentNoteId"));
 
-  // Auto-save changes
-  function saveNote() {
-    const notes = JSON.parse(localStorage.getItem("notes")) || [];
-    const index = notes.findIndex(n => n.title === currentNote.title && n.content === currentNote.content);
+  // Load categories
+  categories.forEach(cat => {
+    const opt = document.createElement("option");
+    opt.value = cat;
+    opt.textContent = cat;
+    noteCategory.appendChild(opt);
+  });
 
-    if (index > -1) {
-      notes[index] = {
-        ...notes[index],
-        title: noteTitle.value,
-        content: noteContent.value
-      };
-    } else {
-      // If somehow note doesn't exist, add it
-      notes.push({ title: noteTitle.value, content: noteContent.value, category: currentNote.category || "Home" });
-    }
-
-    localStorage.setItem("notes", JSON.stringify(notes));
+  // Load current note
+  let currentNote = notes.find(n => n.id === currentNoteId);
+  if (currentNote) {
+    noteTitle.value = currentNote.title;
+    noteContent.value = currentNote.content;
+    noteCategory.value = currentNote.category;
   }
 
-  noteTitle.addEventListener("input", saveNote);
-  noteContent.addEventListener("input", saveNote);
+  saveNoteBtn.addEventListener("click", () => {
+    if (!currentNote) return;
+    currentNote.title = noteTitle.value.trim();
+    currentNote.content = noteContent.value.trim();
+    currentNote.category = noteCategory.value;
+    localStorage.setItem("notes", JSON.stringify(notes));
+    alert("Note saved!");
+  });
 
-  // Return to homepage
   returnHomeBtn.addEventListener("click", () => {
-    saveNote(); // ensure changes saved
     window.location.href = "index.html";
   });
 });
