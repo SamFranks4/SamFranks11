@@ -3,18 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Note</title>
+  <title>Edit Note</title>
   <link rel="stylesheet" href="style.css">
   <style>
     body {
-      background: #f5f5dc; /* beige */
+      background: #f5f5dc;
       display: flex;
       flex-direction: column;
       min-height: 100vh;
     }
 
     header {
-      background: #4F000B; /* dark red */
+      background: #4F000B;
       color: #f5f5dc;
       padding: 1rem;
       display: flex;
@@ -33,7 +33,7 @@
       gap: 1rem;
     }
 
-    #noteTitleDisplay, #noteContentDisplay {
+    input, textarea, select {
       width: 100%;
       border: 1px solid #4F000B;
       border-radius: 5px;
@@ -69,7 +69,7 @@
       font-weight: bold;
       padding: 0.3rem 0.5rem;
       border-radius: 4px;
-      background: #720026; /* deep red */
+      background: #720026;
       transition: background 0.3s;
     }
 
@@ -86,32 +86,39 @@
   <main>
     <input type="text" id="noteTitleDisplay" />
     <textarea id="noteContentDisplay" rows="10"></textarea>
+    <select id="noteCategorySelect">
+      <option value="personal">Personal</option>
+      <option value="work">Work</option>
+      <option value="coding">Coding</option>
+      <option value="cooking">Cooking</option>
+    </select>
     <button id="saveNoteBtn">Save</button>
   </main>
 
   <script>
-    // Load note from LocalStorage
     const currentNote = JSON.parse(localStorage.getItem('currentNote'));
     const notes = JSON.parse(localStorage.getItem('notes')) || [];
 
     const titleInput = document.getElementById('noteTitleDisplay');
     const contentInput = document.getElementById('noteContentDisplay');
+    const categorySelect = document.getElementById('noteCategorySelect');
     const saveBtn = document.getElementById('saveNoteBtn');
 
     if (currentNote) {
       titleInput.value = currentNote.title;
       contentInput.value = currentNote.content;
+      categorySelect.value = currentNote.category || 'personal';
     }
 
     saveBtn.addEventListener('click', () => {
       const updatedNote = {
-        ...currentNote,
         title: titleInput.value,
-        content: contentInput.value
+        content: contentInput.value,
+        category: categorySelect.value
       };
 
-      // Update notes array in LocalStorage
-      const noteIndex = notes.findIndex(n => n.title === currentNote.title && n.content === currentNote.content);
+      // Update notes array
+      const noteIndex = notes.findIndex(n => n.title === currentNote.title && n.content === currentNote.content && n.category === currentNote.category);
       if (noteIndex !== -1) {
         notes[noteIndex] = updatedNote;
       }
