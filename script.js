@@ -1,53 +1,53 @@
-document.addEventListener('DOMContentLoaded', () => {
-  // Elements
-  const notesList = document.getElementById('notesList');
-  const addNoteBtn = document.getElementById('addNoteBtn');
-  const noteModal = document.getElementById('noteModal');
-  const closeModal = document.querySelector('.close');
-  const saveNoteBtn = document.getElementById('saveNoteBtn');
-  const noteTitle = document.getElementById('noteTitle');
-  const noteContent = document.getElementById('noteContent');
-  const noteCategorySelect = document.getElementById('noteCategory');
-  const searchBar = document.getElementById('searchBar');
-  const categoryListUL = document.getElementById('categoryList');
-  const newCategoryInput = document.getElementById('newCategoryInput');
-  const addCategoryBtn = document.getElementById('addCategoryBtn');
+document.addEventListener("DOMContentLoaded", () => {
+  const notesList = document.getElementById("notesList");
+  const addNoteBtn = document.getElementById("addNoteBtn");
+  const noteModal = document.getElementById("noteModal");
+  const closeModal = document.querySelector(".close");
+  const saveNoteBtn = document.getElementById("saveNoteBtn");
+  const noteTitle = document.getElementById("noteTitle");
+  const noteContent = document.getElementById("noteContent");
+  const noteCategorySelect = document.getElementById("noteCategory");
+  const searchBar = document.getElementById("searchBar");
+  const categoryListUL = document.getElementById("categoryList");
+  const newCategoryInput = document.getElementById("newCategoryInput");
+  const addCategoryBtn = document.getElementById("addCategoryBtn");
 
-  let notes = JSON.parse(localStorage.getItem('notes')) || [];
-  let categories = JSON.parse(localStorage.getItem('categories')) || ['Home'];
-  let activeCategory = 'Home';
+  let notes = JSON.parse(localStorage.getItem("notes")) || [];
+  let categories = JSON.parse(localStorage.getItem("categories")) || ["Home"];
+  let activeCategory = "Home";
 
-  // Initialize category dropdown in modal
+  // === CATEGORY FUNCTIONS ===
   function updateModalCategories() {
-    noteCategorySelect.innerHTML = '';
+    noteCategorySelect.innerHTML = "";
     categories.forEach(cat => {
-      const opt = document.createElement('option');
+      const opt = document.createElement("option");
       opt.value = cat;
       opt.textContent = cat;
       noteCategorySelect.appendChild(opt);
     });
   }
 
-  // Render category sidebar
   function renderCategories() {
-    categoryListUL.innerHTML = '';
+    categoryListUL.innerHTML = "";
     categories.forEach(cat => {
-      const li = document.createElement('li');
+      const li = document.createElement("li");
       li.textContent = cat;
-      if (cat === activeCategory) li.classList.add('active');
+      if (cat === activeCategory) li.classList.add("active");
 
-      // Delete button for non-Home categories
-      if (cat !== 'Home') {
-        const delBtn = document.createElement('button');
-        delBtn.textContent = '×';
-        delBtn.className = 'deleteCatBtn';
-        delBtn.addEventListener('click', (e) => {
+      // Delete button
+      if (cat !== "Home") {
+        const delBtn = document.createElement("button");
+        delBtn.textContent = "×";
+        delBtn.className = "deleteCatBtn";
+        delBtn.addEventListener("click", e => {
           e.stopPropagation();
           categories = categories.filter(c => c !== cat);
-          notes = notes.map(note => note.category === cat ? {...note, category:'Home'} : note);
-          localStorage.setItem('categories', JSON.stringify(categories));
-          localStorage.setItem('notes', JSON.stringify(notes));
-          if (activeCategory === cat) activeCategory = 'Home';
+          notes = notes.map(n =>
+            n.category === cat ? { ...n, category: "Home" } : n
+          );
+          localStorage.setItem("categories", JSON.stringify(categories));
+          localStorage.setItem("notes", JSON.stringify(notes));
+          if (activeCategory === cat) activeCategory = "Home";
           renderCategories();
           renderNotes();
           updateModalCategories();
@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
         li.appendChild(delBtn);
       }
 
-      li.addEventListener('click', () => {
+      li.addEventListener("click", () => {
         activeCategory = cat;
         renderCategories();
         renderNotes();
@@ -65,82 +65,91 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Add category button
-  addCategoryBtn.addEventListener('click', () => {
-    const newCat = newCategoryInput.value.trim();
-    if (newCat && !categories.includes(newCat)) {
-      categories.push(newCat);
-      localStorage.setItem('categories', JSON.stringify(categories));
-      newCategoryInput.value = '';
-      renderCategories();
-      updateModalCategories();
-    }
-  });
+  // Make sure the add category button always works
+  function attachAddCategoryListener() {
+    if (!addCategoryBtn) return;
+    addCategoryBtn.addEventListener("click", e => {
+      e.preventDefault();
+      const newCat = newCategoryInput.value.trim();
+      if (newCat && !categories.includes(newCat)) {
+        categories.push(newCat);
+        localStorage.setItem("categories", JSON.stringify(categories));
+        newCategoryInput.value = "";
+        renderCategories();
+        updateModalCategories();
+      }
+    });
+  }
 
-  // Open modal
-  addNoteBtn.addEventListener('click', () => {
-    noteModal.style.display = 'flex';
+  // === NOTES FUNCTIONS ===
+  addNoteBtn.addEventListener("click", () => {
+    noteModal.style.display = "flex";
     updateModalCategories();
     noteCategorySelect.value = activeCategory;
   });
 
-  // Close modal
-  closeModal.addEventListener('click', () => {
-    noteModal.style.display = 'none';
+  closeModal.addEventListener("click", () => {
+    noteModal.style.display = "none";
   });
 
-  // Save note
-  saveNoteBtn.addEventListener('click', () => {
+  saveNoteBtn.addEventListener("click", () => {
     const note = {
-      title: noteTitle.value,
-      content: noteContent.value,
+      title: noteTitle.value.trim(),
+      content: noteContent.value.trim(),
       category: noteCategorySelect.value
     };
+    if (!note.title && !note.content) return;
     notes.push(note);
-    localStorage.setItem('notes', JSON.stringify(notes));
+    localStorage.setItem("notes", JSON.stringify(notes));
     renderNotes();
-    noteModal.style.display = 'none';
-    noteTitle.value = '';
-    noteContent.value = '';
+    noteModal.style.display = "none";
+    noteTitle.value = "";
+    noteContent.value = "";
   });
 
-  // Render notes
   function renderNotes() {
     const searchTerm = searchBar.value.toLowerCase();
-    notesList.innerHTML = '';
-    notes.filter(note => 
-        (activeCategory === 'Home' || note.category === activeCategory) &&
-        (note.title.toLowerCase().includes(searchTerm) || note.content.toLowerCase().includes(searchTerm))
-      ).forEach((note, index) => {
-        const div = document.createElement('div');
-        div.className = 'note';
-        div.innerHTML = `<h3>${note.title}</h3><p>${note.content}</p><button class="deleteBtn" data-index="${index}">×</button>`;
+    notesList.innerHTML = "";
+    notes
+      .filter(
+        note =>
+          (activeCategory === "Home" || note.category === activeCategory) &&
+          (note.title.toLowerCase().includes(searchTerm) ||
+            note.content.toLowerCase().includes(searchTerm))
+      )
+      .forEach((note, index) => {
+        const div = document.createElement("div");
+        div.className = "note";
+        div.innerHTML = `
+          <h3>${note.title}</h3>
+          <p>${note.content}</p>
+          <button class="deleteBtn" data-index="${index}">×</button>
+        `;
         notesList.appendChild(div);
 
-        div.addEventListener('click', (e) => {
-          if (!e.target.classList.contains('deleteBtn')) {
-            localStorage.setItem('currentNote', JSON.stringify(note));
-            window.location.href = 'note.html';
+        div.addEventListener("click", e => {
+          if (!e.target.classList.contains("deleteBtn")) {
+            localStorage.setItem("currentNote", JSON.stringify(note));
+            window.location.href = "note.html";
           }
         });
       });
 
-    const deleteButtons = document.querySelectorAll('.deleteBtn');
-    deleteButtons.forEach(btn => {
-      btn.addEventListener('click', (e) => {
+    document.querySelectorAll(".deleteBtn").forEach(btn => {
+      btn.addEventListener("click", e => {
         const idx = e.target.dataset.index;
-        notes.splice(idx,1);
-        localStorage.setItem('notes', JSON.stringify(notes));
+        notes.splice(idx, 1);
+        localStorage.setItem("notes", JSON.stringify(notes));
         renderNotes();
       });
     });
   }
 
-  searchBar.addEventListener('input', renderNotes);
-  window.addEventListener('focus', renderNotes);
+  searchBar.addEventListener("input", renderNotes);
+  window.addEventListener("focus", renderNotes);
 
-  // Initial render
   renderCategories();
   updateModalCategories();
   renderNotes();
+  attachAddCategoryListener();
 });
