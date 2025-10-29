@@ -63,6 +63,14 @@ function renderNotes(filterCategory = 'all') {
       <button class="deleteBtn" data-index="${index}">×</button>
     `;
     notesList.appendChild(div);
+
+    // When clicking the note (but not the delete button), open note page
+    div.addEventListener('click', (e) => {
+      if (!e.target.classList.contains('deleteBtn')) {
+        localStorage.setItem('currentNote', JSON.stringify(note));
+        window.location.href = 'note.html';
+      }
+    });
   });
 
   // Delete note functionality
