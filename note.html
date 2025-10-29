@@ -65,19 +65,10 @@
       line-height: 1.5rem;
     }
 
-    #saveBtn {
-      align-self: flex-end;
-      padding: 0.5rem 1rem;
-      background: #720026;
-      color: #f5f5dc;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-
-    #saveBtn:hover {
-      background: #4F000B;
+    #status {
+      font-size: 0.9rem;
+      color: #720026;
+      text-align: right;
     }
   </style>
 </head>
@@ -90,16 +81,15 @@
     <div id="editNoteArea">
       <input type="text" id="noteTitle" placeholder="Title">
       <textarea id="noteContent" placeholder="Content"></textarea>
-      <button id="saveBtn">Save</button>
+      <div id="status">All changes saved.</div>
     </div>
   </main>
 
   <script>
     const noteTitleInput = document.getElementById("noteTitle");
     const noteContentInput = document.getElementById("noteContent");
-    const saveBtn = document.getElementById("saveBtn");
+    const status = document.getElementById("status");
 
-    // Load current note from localStorage
     let currentNote = JSON.parse(localStorage.getItem("currentNote"));
 
     if (currentNote) {
@@ -107,10 +97,9 @@
       noteContentInput.value = currentNote.content;
     }
 
-    saveBtn.addEventListener("click", () => {
+    function saveNote() {
       if (!currentNote) return;
 
-      // Update the note in the saved notes array
       let notes = JSON.parse(localStorage.getItem("notes")) || [];
       const noteIndex = notes.findIndex(n => n.title === currentNote.title && n.content === currentNote.content && n.category === currentNote.category);
 
@@ -118,11 +107,23 @@
         notes[noteIndex].title = noteTitleInput.value;
         notes[noteIndex].content = noteContentInput.value;
         localStorage.setItem("notes", JSON.stringify(notes));
-        // Update currentNote for consistency
+
         currentNote = notes[noteIndex];
         localStorage.setItem("currentNote", JSON.stringify(currentNote));
-        alert("Note saved!");
+
+        status.textContent = "All changes saved.";
       }
+    }
+
+    // Auto-save on input
+    noteTitleInput.addEventListener("input", () => {
+      status.textContent = "Saving...";
+      saveNote();
+    });
+
+    noteContentInput.addEventListener("input", () => {
+      status.textContent = "Saving...";
+      saveNote();
     });
   </script>
 </body>
