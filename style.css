@@ -17,7 +17,7 @@ header {
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
-  background: #333;
+  background: #4A7856; /* dark green */
   color: #fff;
 }
 
@@ -34,7 +34,7 @@ header input {
 
 aside {
   width: 200px;
-  background: #eee;
+  background: #94ECBE; /* light mint */
   padding: 1rem;
 }
 
@@ -49,6 +49,7 @@ aside li {
 
 aside li.active {
   font-weight: bold;
+  color: #4A7856; /* dark green text for active */
 }
 
 main {
@@ -66,21 +67,26 @@ main {
 }
 
 .note {
-  background: #fff;
+  background: #fff; /* white for readability */
   padding: 1rem;
   border-radius: 5px;
   cursor: pointer;
-  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+  box-shadow: 0 0 5px rgba(74, 120, 86, 0.3); /* subtle green shadow */
 }
 
 #addNoteBtn {
   margin-top: 1rem;
   padding: 0.5rem;
   border: none;
-  background: #333;
+  background: #4A7856; /* dark green */
   color: #fff;
   border-radius: 5px;
   cursor: pointer;
+  transition: background 0.3s;
+}
+
+#addNoteBtn:hover {
+  background: #3c6247; /* slightly darker hover */
 }
 
 .modal {
@@ -109,6 +115,20 @@ main {
   width: 100%;
   margin-bottom: 0.5rem;
   padding: 0.5rem;
+}
+
+#saveNoteBtn {
+  padding: 0.5rem;
+  border: none;
+  background: #4A7856; /* dark green */
+  color: #fff;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+#saveNoteBtn:hover {
+  background: #3c6247;
 }
 
 .close {
