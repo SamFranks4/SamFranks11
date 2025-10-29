@@ -11,7 +11,7 @@ const categories = document.querySelectorAll('#categories li');
 
 let notes = [];
 
-// Load notes from localStorage
+// Load notes from LocalStorage
 const savedNotes = localStorage.getItem('notes');
 if (savedNotes) {
   notes = JSON.parse(savedNotes);
@@ -37,8 +37,6 @@ saveNoteBtn.addEventListener('click', () => {
   };
   
   notes.push(note);
-  
-  // Save to localStorage
   localStorage.setItem('notes', JSON.stringify(notes));
   
   renderNotes();
@@ -64,7 +62,7 @@ function renderNotes(filterCategory = 'all') {
     `;
     notesList.appendChild(div);
 
-    // When clicking the note (but not the delete button), open note page
+    // Click note to open edit page
     div.addEventListener('click', (e) => {
       if (!e.target.classList.contains('deleteBtn')) {
         localStorage.setItem('currentNote', JSON.stringify(note));
@@ -73,7 +71,7 @@ function renderNotes(filterCategory = 'all') {
     });
   });
 
-  // Delete note functionality
+  // Delete note
   const deleteButtons = document.querySelectorAll('.deleteBtn');
   deleteButtons.forEach(btn => {
     btn.addEventListener('click', (e) => {
