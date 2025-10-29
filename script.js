@@ -6,10 +6,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const saveNoteBtn = document.getElementById("saveNoteBtn");
   const noteTitle = document.getElementById("noteTitle");
   const noteContent = document.getElementById("noteContent");
+  const noteTags = document.getElementById("noteTags");
+  const notePinned = document.getElementById("notePinned");
   const noteCategorySelect = document.getElementById("noteCategory");
   const searchBar = document.getElementById("searchBar");
   const categoryListUL = document.getElementById("categoryList");
-  const newCategoryInput = document.getElementById("newCategoryInput");
   const addCategoryBtn = document.getElementById("addCategoryBtn");
 
   let notes = JSON.parse(localStorage.getItem("notes")) || [];
@@ -34,28 +35,6 @@ document.addEventListener("DOMContentLoaded", () => {
       li.textContent = cat;
       if (cat === activeCategory) li.classList.add("active");
 
-      // Delete button
-      if (cat !== "Home") {
-        const delBtn = document.createElement("button");
-        delBtn.textContent = "×";
-        delBtn.className = "deleteCatBtn";
-        delBtn.addEventListener("click", e => {
-          e.stopPropagation();
-          const confirmDeleteCat = confirm(`Are you sure you want to delete the category "${cat}"? Notes in this category will move to Home.`);
-          if (confirmDeleteCat) {
-            categories = categories.filter(c => c !== cat);
-            notes = notes.map(n => n.category === cat ? { ...n, category: "Home" } : n);
-            localStorage.setItem("categories", JSON.stringify(categories));
-            localStorage.setItem("notes", JSON.stringify(notes));
-            if (activeCategory === cat) activeCategory = "Home";
-            renderCategories();
-            renderNotes();
-            updateModalCategories();
-          }
-        });
-        li.appendChild(delBtn);
-      }
-
       li.addEventListener("click", () => {
         activeCategory = cat;
         renderCategories();
@@ -66,27 +45,25 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Make sure the add category button always works
-  function attachAddCategoryListener() {
-    if (!addCategoryBtn) return;
-    addCategoryBtn.addEventListener("click", e => {
-      e.preventDefault();
-      const newCat = newCategoryInput.value.trim();
-      if (newCat && !categories.includes(newCat)) {
-        categories.push(newCat);
-        localStorage.setItem("categories", JSON.stringify(categories));
-        newCategoryInput.value = "";
-        renderCategories();
-        updateModalCategories();
-      }
-    });
-  }
+  addCategoryBtn.addEventListener("click", () => {
+    const newCat = prompt("Enter category name:").trim();
+    if (newCat && !categories.includes(newCat)) {
+      categories.push(newCat);
+      localStorage.setItem("categories", JSON.stringify(categories));
+      renderCategories();
+      updateModalCategories();
+    }
+  });
 
   // === NOTES FUNCTIONS ===
   addNoteBtn.addEventListener("click", () => {
     noteModal.style.display = "flex";
     updateModalCategories();
     noteCategorySelect.value = activeCategory;
+    noteTitle.value = "";
+    noteContent.innerHTML = "";
+    noteTags.value = "";
+    notePinned.checked = false;
   });
 
   closeModal.addEventListener("click", () => {
@@ -96,7 +73,9 @@ document.addEventListener("DOMContentLoaded", () => {
   saveNoteBtn.addEventListener("click", () => {
     const note = {
       title: noteTitle.value.trim(),
-      content: noteContent.value.trim(),
+      content: noteContent.innerHTML.trim(),
+      tags: noteTags.value.split(",").map(t => t.trim()).filter(Boolean),
+      pinned: notePinned.checked,
       category: noteCategorySelect.value
     };
     if (!note.title && !note.content) return;
@@ -104,56 +83,44 @@ document.addEventListener("DOMContentLoaded", () => {
     localStorage.setItem("notes", JSON.stringify(notes));
     renderNotes();
     noteModal.style.display = "none";
-    noteTitle.value = "";
-    noteContent.value = "";
   });
 
   function renderNotes() {
     const searchTerm = searchBar.value.toLowerCase();
     notesList.innerHTML = "";
-    notes
-      .filter(
-        note =>
-          (activeCategory === "Home" || note.category === activeCategory) &&
-          (note.title.toLowerCase().includes(searchTerm) ||
-            note.content.toLowerCase().includes(searchTerm))
+    const sortedNotes = [...notes].sort((a,b) => b.pinned - a.pinned); // pinned first
+    sortedNotes
+      .filter(note =>
+        (activeCategory === "Home" || note.category === activeCategory) &&
+        (note.title.toLowerCase().includes(searchTerm) ||
+         note.content.toLowerCase().includes(searchTerm) ||
+         note.tags.join(" ").toLowerCase().includes(searchTerm))
       )
       .forEach((note, index) => {
         const div = document.createElement("div");
         div.className = "note";
         div.innerHTML = `
+          ${note.pinned ? '<div class="pinned">📌 Pinned</div>' : ''}
           <h3>${note.title}</h3>
-          <p>${note.content}</p>
+          <div class="tags">${note.tags.join(", ")}</div>
+          <div class="noteContent">${note.content}</div>
           <button class="deleteBtn" data-index="${index}">×</button>
         `;
         notesList.appendChild(div);
 
-        div.addEventListener("click", e => {
-          if (!e.target.classList.contains("deleteBtn")) {
-            localStorage.setItem("currentNote", JSON.stringify(note));
-            window.location.href = "note.html";
+        div.querySelector(".deleteBtn").addEventListener("click", e => {
+          e.stopPropagation();
+          if (confirm("Are you sure you want to delete this note?")) {
+            notes.splice(index, 1);
+            localStorage.setItem("notes", JSON.stringify(notes));
+            renderNotes();
           }
         });
       });
-
-    document.querySelectorAll(".deleteBtn").forEach(btn => {
-      btn.addEventListener("click", e => {
-        const idx = e.target.dataset.index;
-        const confirmDelete = confirm("Are you sure you want to delete this note?");
-        if (confirmDelete) {
-          notes.splice(idx, 1);
-          localStorage.setItem("notes", JSON.stringify(notes));
-          renderNotes();
-        }
-      });
-    });
   }
 
   searchBar.addEventListener("input", renderNotes);
-  window.addEventListener("focus", renderNotes);
-
   renderCategories();
   updateModalCategories();
   renderNotes();
-  attachAddCategoryListener();
 });
