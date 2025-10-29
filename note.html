@@ -3,40 +3,87 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My Notes</title>
+<title>Note</title>
 <link rel="stylesheet" href="style.css">
+<style>
+  body {
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f5f5dc; /* same beige background */
+  }
+
+  header {
+    background: #4F000B;
+    color: #f5f5dc;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+  }
+
+  header h1 {
+    flex: 1;
+    margin: 0;
+  }
+
+  #backBtn {
+    background: #720026;
+    color: #f5f5dc;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  #noteContentEditable {
+    margin: 1rem;
+    padding: 1rem;
+    border: 1px solid #4F000B;
+    border-radius: 5px;
+    min-height: 400px;
+    background: #fff;
+    outline: none;
+    white-space: pre-wrap;
+  }
+
+  #noteTitleEditable {
+    margin: 1rem;
+    padding: 0.5rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+    border: none;
+    border-bottom: 2px solid #4F000B;
+    width: calc(100% - 2rem);
+    background: transparent;
+    color: #4F000B;
+    outline: none;
+  }
+
+  #saveBtn {
+    margin: 1rem;
+    padding: 0.5rem 1rem;
+    background: #4F000B;
+    color: #f5f5dc;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  #saveBtn:hover, #backBtn:hover {
+    background: #720026;
+  }
+</style>
 </head>
 <body>
+  <header>
+    <h1>Edit Note</h1>
+    <button id="backBtn">← Home</button>
+  </header>
 
-<header>
-  <h1>My Notes</h1>
-  <input type="text" id="searchBar" placeholder="Search notes...">
-  <div class="header-buttons">
-    <button id="addNoteBtn">+ Add Note</button>
-    <button id="addCategoryBtn">+ Add Category</button>
-  </div>
-</header>
+  <input id="noteTitleEditable" placeholder="Title">
+  <div id="noteContentEditable" contenteditable="true"></div>
+  <button id="saveBtn">Save</button>
 
-<div class="container">
-  <aside>
-    <ul id="categoryList"></ul>
-  </aside>
-  <main>
-    <div id="notesList"></div>
-  </main>
-</div>
-
-<!-- Modal for adding/editing notes -->
-<div id="noteModal" class="modal">
-  <div class="modal-content">
-    <span class="close">&times;</span>
-    <input type="text" id="noteTitle" placeholder="Title">
-    <textarea id="noteContent" placeholder="Content"></textarea>
-    <select id="noteCategory"></select>
-    <button id="saveNoteBtn">Save</button>
-  </div>
-</div>
-
-<script src="script.js"></script>
+  <script src="note.js"></script>
 </body>
 </html>
