@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   const notesList = document.getElementById("notesList");
   const addNoteBtn = document.getElementById("addNoteBtn");
+  const addCategoryBtn = document.getElementById("addCategoryBtn");
   const noteModal = document.getElementById("noteModal");
   const closeModal = document.querySelector(".close");
   const saveNoteBtn = document.getElementById("saveNoteBtn");
@@ -10,7 +11,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const searchBar = document.getElementById("searchBar");
   const categoryListUL = document.getElementById("categoryList");
   const newCategoryInput = document.getElementById("newCategoryInput");
-  const addCategoryBtn = document.getElementById("addCategoryBtn");
 
   let notes = JSON.parse(localStorage.getItem("notes")) || [];
   let categories = JSON.parse(localStorage.getItem("categories")) || ["Home"];
@@ -34,7 +34,6 @@ document.addEventListener("DOMContentLoaded", () => {
       li.textContent = cat;
       if (cat === activeCategory) li.classList.add("active");
 
-      // Delete button
       if (cat !== "Home") {
         const delBtn = document.createElement("button");
         delBtn.textContent = "×";
@@ -42,9 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
         delBtn.addEventListener("click", e => {
           e.stopPropagation();
           categories = categories.filter(c => c !== cat);
-          notes = notes.map(n =>
-            n.category === cat ? { ...n, category: "Home" } : n
-          );
+          notes = notes.map(n => (n.category === cat ? { ...n, category: "Home" } : n));
           localStorage.setItem("categories", JSON.stringify(categories));
           localStorage.setItem("notes", JSON.stringify(notes));
           if (activeCategory === cat) activeCategory = "Home";
@@ -108,12 +105,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const searchTerm = searchBar.value.toLowerCase();
     notesList.innerHTML = "";
     notes
-      .filter(
-        note =>
-          (activeCategory === "Home" || note.category === activeCategory) &&
-          (note.title.toLowerCase().includes(searchTerm) ||
-            note.content.toLowerCase().includes(searchTerm))
-      )
+      .filter(note => (activeCategory === "Home" || note.category === activeCategory) &&
+                      (note.title.toLowerCase().includes(searchTerm) || note.content.toLowerCase().includes(searchTerm)))
       .forEach((note, index) => {
         const div = document.createElement("div");
         div.className = "note";
@@ -124,7 +117,6 @@ document.addEventListener("DOMContentLoaded", () => {
         `;
         notesList.appendChild(div);
 
-        // CLICK NOTE TO OPEN EDITABLE PAGE
         div.addEventListener("click", e => {
           if (!e.target.classList.contains("deleteBtn")) {
             localStorage.setItem("currentNote", JSON.stringify(note));
