@@ -3,124 +3,202 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Note</title>
+  <title>My Notes</title>
   <link rel="stylesheet" href="style.css">
   <style>
     body {
-      background: #f5f5dc; /* beige */
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
+      font-family: sans-serif;
+      background: #f5f5dc;
+      margin: 0;
+      padding: 0;
     }
 
     header {
-      background: #4F000B; /* dark red */
+      background: #4F000B;
       color: #f5f5dc;
       padding: 1rem;
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      font-size: 1.2rem;
-    }
-
-    main {
-      flex: 1;
-      padding: 2rem;
-      max-width: 800px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
       gap: 1rem;
     }
 
-    #noteTitleDisplay, #noteContentDisplay {
-      width: 100%;
-      border: 1px solid #4F000B;
+    header h1 {
+      flex: 1;
+      margin: 0;
+    }
+
+    header input {
+      padding: 0.4rem;
       border-radius: 5px;
-      padding: 0.5rem;
-      font-size: 1.2rem;
-      background: #fff;
-      color: #333;
+      border: none;
+      flex: 2;
     }
 
-    #noteTitleDisplay {
-      font-size: 2rem;
-      color: #4F000B;
-    }
-
-    #saveNoteBtn {
-      padding: 0.5rem 1rem;
-      background: #4F000B;
+    header button {
+      padding: 0.4rem 0.8rem;
+      background: #720026;
       color: #f5f5dc;
       border: none;
       border-radius: 5px;
       cursor: pointer;
-      align-self: flex-start;
-      transition: background 0.3s;
     }
 
-    #saveNoteBtn:hover {
+    .container {
+      display: flex;
+      min-height: calc(100vh - 70px);
+    }
+
+    aside {
+      width: 150px;
+      background: #4F000B;
+      color: #f5f5dc;
+      padding: 1rem;
+    }
+
+    aside ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    aside li {
+      cursor: pointer;
+      padding: 0.4rem;
+      border-radius: 4px;
+      margin-bottom: 0.3rem;
+    }
+
+    aside li.active, aside li:hover {
       background: #720026;
     }
 
-    a {
-      color: #f5f5dc;
-      text-decoration: none;
-      font-weight: bold;
-      padding: 0.3rem 0.5rem;
-      border-radius: 4px;
-      background: #720026; /* deep red */
-      transition: background 0.3s;
+    main {
+      flex: 1;
+      padding: 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
     }
 
-    a:hover {
+    .note {
+      background: #fff;
+      padding: 0.8rem;
+      border-radius: 5px;
+      border-left: 5px solid #4F000B;
+      width: 200px;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .note h3 {
+      margin: 0 0 0.5rem 0;
+      color: #4F000B;
+    }
+
+    .note p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: #333;
+    }
+
+    .deleteBtn {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background: #720026;
+      color: #f5f5dc;
+      border: none;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background: #f5f5dc;
+      padding: 1rem;
+      border-radius: 5px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      width: 300px;
+    }
+
+    .modal-content input, .modal-content textarea, .modal-content select {
+      padding: 0.4rem;
+      border-radius: 4px;
+      border: 1px solid #4F000B;
+      width: 100%;
+    }
+
+    .modal-content button {
       background: #4F000B;
+      color: #f5f5dc;
+      border: none;
+      padding: 0.5rem;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    .close {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      color: #720026;
     }
   </style>
 </head>
 <body>
   <header>
-    <span>Edit Note</span>
-    <a href="index.html">← Back</a>
+    <h1>My Notes</h1>
+    <input type="text" id="searchBar" placeholder="Search notes...">
+    <button id="addNoteBtn">+ Add Note</button>
   </header>
-  <main>
-    <input type="text" id="noteTitleDisplay" />
-    <textarea id="noteContentDisplay" rows="10"></textarea>
-    <button id="saveNoteBtn">Save</button>
-  </main>
 
-  <script>
-    // Load note from LocalStorage
-    const currentNote = JSON.parse(localStorage.getItem('currentNote'));
-    const notes = JSON.parse(localStorage.getItem('notes')) || [];
+  <div class="container">
+    <aside>
+      <ul id="categories">
+        <li class="active" data-category="all">All</li>
+        <li data-category="personal">Personal</li>
+        <li data-category="work">Work</li>
+        <li data-category="coding">Coding</li>
+        <li data-category="cooking">Cooking</li>
+      </ul>
+    </aside>
 
-    const titleInput = document.getElementById('noteTitleDisplay');
-    const contentInput = document.getElementById('noteContentDisplay');
-    const saveBtn = document.getElementById('saveNoteBtn');
+    <main>
+      <div id="notesList"></div>
+    </main>
+  </div>
 
-    if (currentNote) {
-      titleInput.value = currentNote.title;
-      contentInput.value = currentNote.content;
-    }
+  <div id="noteModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <input type="text" id="noteTitle" placeholder="Title">
+      <textarea id="noteContent" placeholder="Content"></textarea>
+      <select id="noteCategory">
+        <option value="personal">Personal</option>
+        <option value="work">Work</option>
+        <option value="coding">Coding</option>
+        <option value="cooking">Cooking</option>
+      </select>
+      <button id="saveNoteBtn">Save</button>
+    </div>
+  </div>
 
-    saveBtn.addEventListener('click', () => {
-      const updatedNote = {
-        ...currentNote,
-        title: titleInput.value,
-        content: contentInput.value
-      };
-
-      // Update notes array in LocalStorage
-      const noteIndex = notes.findIndex(n => n.title === currentNote.title && n.content === currentNote.content);
-      if (noteIndex !== -1) {
-        notes[noteIndex] = updatedNote;
-      }
-
-      localStorage.setItem('notes', JSON.stringify(notes));
-      localStorage.setItem('currentNote', JSON.stringify(updatedNote));
-
-      alert('Note saved!');
-    });
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
