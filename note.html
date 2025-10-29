@@ -5,69 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Edit Note</title>
   <link rel="stylesheet" href="style.css">
-  <style>
-    body {
-      font-family: sans-serif;
-      margin: 0;
-      padding: 0;
-      background: #f5f5dc;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
-
-    header {
-      background: #4F000B;
-      color: #f5f5dc;
-      padding: 1rem;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    #returnHomeBtn {
-      background: #720026;
-      color: #f5f5dc;
-      border: none;
-      border-radius: 5px;
-      padding: 0.5rem 1rem;
-      cursor: pointer;
-    }
-
-    #returnHomeBtn:hover {
-      background: #4F000B;
-    }
-
-    main {
-      flex: 1;
-      padding: 1rem;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    #noteTitle, #noteContent {
-      width: 100%;
-      padding: 0.5rem;
-      border-radius: 5px;
-      border: 1px solid #4F000B;
-      font-size: 1rem;
-    }
-
-    #noteContent {
-      min-height: 300px;
-      resize: vertical;
-    }
-  </style>
 </head>
 <body>
   <header>
-    <button id="returnHomeBtn">← Home</button>
+    <h1>Edit Note</h1>
+    <button id="returnHomeBtn">Return to Home</button>
   </header>
 
   <main>
-    <input type="text" id="noteTitle" placeholder="Title">
-    <textarea id="noteContent" placeholder="Content"></textarea>
+    <div class="note-editor">
+      <input type="text" id="noteTitle" placeholder="Title">
+      <textarea id="noteContent" placeholder="Content"></textarea>
+      <select id="noteCategory"></select>
+      <button id="saveNoteBtn">Save</button>
+    </div>
   </main>
 
   <script src="note.js"></script>
