@@ -9,7 +9,7 @@ body {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background: #f8f8f8; /* keep background light for readability */
+  background: #f5f5dc; /* beige background */
 }
 
 header {
@@ -34,8 +34,9 @@ header input {
 
 aside {
   width: 200px;
-  background: #f5f5dc; /* beige sidebar */
+  background: #720026; /* deeper red sidebar */
   padding: 1rem;
+  color: #f5f5dc;
 }
 
 aside ul {
@@ -45,7 +46,7 @@ aside ul {
 aside li {
   padding: 0.5rem;
   cursor: pointer;
-  color: #4F000B; /* dark red text */
+  color: #f5f5dc; /* beige text for sidebar items */
 }
 
 aside li.active {
@@ -68,7 +69,7 @@ main {
 }
 
 .note {
-  background: #fff; /* keep notes white for readability */
+  background: #fff; /* white for readability */
   padding: 1rem;
   border-radius: 5px;
   cursor: pointer;
@@ -78,7 +79,7 @@ main {
 
 .note:hover {
   transform: translateY(-2px);
-  box-shadow: 0 0 10px rgba(79, 0, 11, 0.5);
+  box-shadow: 0 0 10px rgba(79, 0, 17, 0.5);
 }
 
 #addNoteBtn {
@@ -93,7 +94,7 @@ main {
 }
 
 #addNoteBtn:hover {
-  background: #3a0008; /* darker hover */
+  background: #720026; /* deeper red on hover */
 }
 
 /* Modal */
@@ -126,7 +127,7 @@ main {
   padding: 0.5rem;
   border: 1px solid #4F000B; /* dark red border */
   border-radius: 5px;
-  background: #fff; /* keep inputs readable */
+  background: #fff;
   color: #333;
 }
 
@@ -141,7 +142,7 @@ main {
 }
 
 #saveNoteBtn:hover {
-  background: #3a0008; /* darker hover */
+  background: #720026; /* deeper red hover */
 }
 
 .close {
@@ -153,5 +154,5 @@ main {
 }
 
 .close:hover {
-  color: #3a0008; /* darker hover */
+  color: #720026; /* deeper red hover */
 }
