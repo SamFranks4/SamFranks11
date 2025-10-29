@@ -10,16 +10,13 @@
   <header>
     <h1>My Notes</h1>
     <input type="text" id="searchBar" placeholder="Search notes...">
-    <div class="header-buttons">
-      <button id="addNoteBtn">+ Add Note</button>
-      <button id="addCategoryBtn">+ Add Category</button>
-    </div>
+    <button id="addNoteBtn">+ Add Note</button>
+    <button id="addCategoryBtn">+ Add Category</button>
   </header>
 
   <div class="container">
     <aside>
       <ul id="categoryList"></ul>
-      <input type="text" id="newCategoryInput" placeholder="New category">
     </aside>
     <main>
       <div id="notesList"></div>
@@ -30,12 +27,17 @@
     <div class="modal-content">
       <span class="close">&times;</span>
       <input type="text" id="noteTitle" placeholder="Title">
-      <textarea id="noteContent" placeholder="Content"></textarea>
+      <div id="noteContent" contenteditable="true" placeholder="Content" class="editable"></div>
+      <input type="text" id="noteTags" placeholder="Tags (comma separated)">
+      <label><input type="checkbox" id="notePinned"> Pin Note</label>
       <select id="noteCategory"></select>
       <button id="saveNoteBtn">Save</button>
     </div>
   </div>
 
+  <script src="script.js"></script>
+</body>
+</html>
   <script src="script.js"></script>
 </body>
 </html>
