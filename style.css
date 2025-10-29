@@ -46,7 +46,7 @@ aside ul {
 aside li {
   padding: 0.5rem;
   cursor: pointer;
-  color: #f5f5dc; /* beige text for sidebar items */
+  color: #f5f5dc; /* beige text */
 }
 
 aside li.active {
@@ -69,6 +69,7 @@ main {
 }
 
 .note {
+  position: relative; /* for delete button */
   background: #fff; /* white for readability */
   padding: 1rem;
   border-radius: 5px;
@@ -80,6 +81,29 @@ main {
 .note:hover {
   transform: translateY(-2px);
   box-shadow: 0 0 10px rgba(79, 0, 17, 0.5);
+}
+
+/* Delete button */
+.deleteBtn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: #720026; /* deep red */
+  color: #f5f5dc; /* beige text */
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 20px;
+  text-align: center;
+  transition: background 0.3s;
+}
+
+.deleteBtn:hover {
+  background: #4F000B; /* darker red on hover */
 }
 
 #addNoteBtn {
