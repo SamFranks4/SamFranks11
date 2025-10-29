@@ -1,173 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Edit Note</title>
-  <link rel="stylesheet" href="style.css">
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Arial', sans-serif;
-      background: #f5f5dc;
-      color: #000;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1rem 2rem;
-      background: #f5f5dc;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
-
-    header a {
-      text-decoration: none;
-      color: #720026;
-      font-weight: bold;
-      font-size: 1rem;
-      padding: 0.3rem 0.6rem;
-      border-radius: 4px;
-      transition: background 0.3s;
-    }
-
-    header a:hover {
-      background: #4F000B;
-      color: #f5f5dc;
-    }
-
-    #noteTitleDisplay {
-      font-size: 2rem;
-      font-weight: bold;
-      width: 100%;
-      border: none;
-      outline: none;
-      margin-bottom: 1rem;
-      background: transparent;
-    }
-
-    #noteContentDisplay {
-      flex: 1;
-      width: 100%;
-      border: none;
-      outline: none;
-      resize: none;
-      font-size: 1.1rem;
-      line-height: 1.6;
-      background: transparent;
-      padding: 0;
-    }
-
-    main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      max-width: 900px;
-      margin: 2rem auto;
-      padding: 0 2rem;
-    }
-
-    #noteCategorySelect {
-      margin-bottom: 1rem;
-      padding: 0.4rem;
-      font-size: 1rem;
-      border: 1px solid #720026;
-      border-radius: 4px;
-      width: 200px;
-      background: #fff;
-      color: #000;
-    }
-
-    #saveNoteBtn {
-      margin-top: 1rem;
-      padding: 0.6rem 1rem;
-      font-size: 1rem;
-      border: none;
-      border-radius: 5px;
-      background: #720026;
-      color: #f5f5dc;
-      cursor: pointer;
-      align-self: flex-start;
-      transition: background 0.3s;
-    }
-
-    #saveNoteBtn:hover {
-      background: #4F000B;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Notes</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
-    <span>Editing Note</span>
-    <a href="index.html">← Back</a>
-  </header>
 
+<header>
+  <h1>My Notes</h1>
+  <input type="text" id="searchBar" placeholder="Search notes...">
+  <div class="header-buttons">
+    <button id="addNoteBtn">+ Add Note</button>
+    <button id="addCategoryBtn">+ Add Category</button>
+  </div>
+</header>
+
+<div class="container">
+  <aside>
+    <ul id="categoryList"></ul>
+  </aside>
   <main>
-    <input type="text" id="noteTitleDisplay" placeholder="Note Title">
-    <textarea id="noteContentDisplay" placeholder="Start typing..." rows="20"></textarea>
-    <select id="noteCategorySelect"></select>
-    <button id="saveNoteBtn">Save</button>
+    <div id="notesList"></div>
   </main>
+</div>
 
-  <script>
-    // Grab notes and categories from LocalStorage
-    const notes = JSON.parse(localStorage.getItem('notes')) || [];
-    const categories = JSON.parse(localStorage.getItem('categories')) || ['Home'];
-    const currentNote = JSON.parse(localStorage.getItem('currentNote'));
+<!-- Modal for adding/editing notes -->
+<div id="noteModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <input type="text" id="noteTitle" placeholder="Title">
+    <textarea id="noteContent" placeholder="Content"></textarea>
+    <select id="noteCategory"></select>
+    <button id="saveNoteBtn">Save</button>
+  </div>
+</div>
 
-    const titleInput = document.getElementById('noteTitleDisplay');
-    const contentInput = document.getElementById('noteContentDisplay');
-    const categorySelect = document.getElementById('noteCategorySelect');
-    const saveBtn = document.getElementById('saveNoteBtn');
-
-    // Populate category dropdown dynamically
-    function populateCategories() {
-      categorySelect.innerHTML = '';
-      categories.forEach(cat => {
-        const opt = document.createElement('option');
-        opt.value = cat;
-        opt.textContent = cat;
-        categorySelect.appendChild(opt);
-      });
-    }
-
-    populateCategories();
-
-    // Pre-fill inputs with current note data
-    if (currentNote) {
-      titleInput.value = currentNote.title;
-      contentInput.value = currentNote.content;
-      categorySelect.value = currentNote.category || 'Home';
-    }
-
-    // Save changes
-    saveBtn.addEventListener('click', () => {
-      const updatedNote = {
-        title: titleInput.value,
-        content: contentInput.value,
-        category: categorySelect.value
-      };
-
-      const noteIndex = notes.findIndex(n => 
-        n.title === currentNote.title &&
-        n.content === currentNote.content &&
-        n.category === currentNote.category
-      );
-
-      if (noteIndex !== -1) {
-        notes[noteIndex] = updatedNote;
-      }
-
-      localStorage.setItem('notes', JSON.stringify(notes));
-      localStorage.setItem('currentNote', JSON.stringify(updatedNote));
-
-      alert('Note saved!');
-    });
-  </script>
+<script src="script.js"></script>
 </body>
 </html>
