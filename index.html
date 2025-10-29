@@ -2,44 +2,48 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Sam Franks Portfolio</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sam's Notes</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <aside class="sidebar">
-    <h1>Sam Franks</h1>
-    <nav>
-      <a href="#home">Home</a>
-      <a href="#about">About Me</a>
-      <a href="#projects">Projects</a>
-      <a href="#contact">Contact</a>
-    </nav>
-  </aside>
+  <header>
+    <h1>Sam's Notes</h1>
+    <input type="text" id="searchBar" placeholder="Search notes...">
+  </header>
 
-  <main class="content">
-    <section id="home">
-      <h2>Welcome</h2>
-      <p>Hi, I'm Sam. This is my professional portfolio.</p>
-    </section>
-
-    <section id="about">
-      <h2>About Me</h2>
-      <p>Write a short bio about yourself here.</p>
-    </section>
-
-    <section id="projects">
-      <h2>Projects</h2>
-      <ul>
-        <li>Project 1: Description</li>
-        <li>Project 2: Description</li>
+  <div class="container">
+    <aside>
+      <h2>Categories</h2>
+      <ul id="categories">
+        <li data-category="all" class="active">All</li>
+        <li data-category="work">Work</li>
+        <li data-category="school">School</li>
+        <li data-category="personal">Personal</li>
       </ul>
-    </section>
+    </aside>
 
-    <section id="contact">
-      <h2>Contact</h2>
-      <p>Email: sam@example.com</p>
-    </section>
-  </main>
+    <main>
+      <div id="notesList">
+        <!-- Notes will appear here -->
+      </div>
+      <button id="addNoteBtn">+ Add Note</button>
+    </main>
+  </div>
+
+  <div id="noteModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <input type="text" id="noteTitle" placeholder="Title">
+      <textarea id="noteContent" placeholder="Write your note here..."></textarea>
+      <select id="noteCategory">
+        <option value="work">Work</option>
+        <option value="school">School</option>
+        <option value="personal">Personal</option>
+      </select>
+      <button id="saveNoteBtn">Save Note</button>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>
