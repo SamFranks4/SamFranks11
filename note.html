@@ -6,7 +6,6 @@
   <title>Note</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    /* Specific styling for note page */
     body {
       background: #f5f5dc; /* beige */
       display: flex;
@@ -29,20 +28,39 @@
       padding: 2rem;
       max-width: 800px;
       margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    #noteTitleDisplay, #noteContentDisplay {
+      width: 100%;
+      border: 1px solid #4F000B;
+      border-radius: 5px;
+      padding: 0.5rem;
+      font-size: 1.2rem;
+      background: #fff;
+      color: #333;
     }
 
     #noteTitleDisplay {
-      margin-bottom: 1rem;
       font-size: 2rem;
       color: #4F000B;
-      word-wrap: break-word;
     }
 
-    #noteContentDisplay {
-      font-size: 1.2rem;
-      line-height: 1.6;
-      color: #333;
-      white-space: pre-wrap; /* keeps line breaks from textarea */
+    #saveNoteBtn {
+      padding: 0.5rem 1rem;
+      background: #4F000B;
+      color: #f5f5dc;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      align-self: flex-start;
+      transition: background 0.3s;
+    }
+
+    #saveNoteBtn:hover {
+      background: #720026;
     }
 
     a {
@@ -62,20 +80,47 @@
 </head>
 <body>
   <header>
-    <span id="noteTitleDisplay">Note</span>
+    <span>Edit Note</span>
     <a href="index.html">← Back</a>
   </header>
   <main>
-    <p id="noteContentDisplay"></p>
+    <input type="text" id="noteTitleDisplay" />
+    <textarea id="noteContentDisplay" rows="10"></textarea>
+    <button id="saveNoteBtn">Save</button>
   </main>
 
   <script>
-    // Load the clicked note from LocalStorage
-    const noteData = JSON.parse(localStorage.getItem('currentNote'));
-    if (noteData) {
-      document.getElementById('noteTitleDisplay').innerText = noteData.title;
-      document.getElementById('noteContentDisplay').innerText = noteData.content;
+    // Load note from LocalStorage
+    const currentNote = JSON.parse(localStorage.getItem('currentNote'));
+    const notes = JSON.parse(localStorage.getItem('notes')) || [];
+
+    const titleInput = document.getElementById('noteTitleDisplay');
+    const contentInput = document.getElementById('noteContentDisplay');
+    const saveBtn = document.getElementById('saveNoteBtn');
+
+    if (currentNote) {
+      titleInput.value = currentNote.title;
+      contentInput.value = currentNote.content;
     }
+
+    saveBtn.addEventListener('click', () => {
+      const updatedNote = {
+        ...currentNote,
+        title: titleInput.value,
+        content: contentInput.value
+      };
+
+      // Update notes array in LocalStorage
+      const noteIndex = notes.findIndex(n => n.title === currentNote.title && n.content === currentNote.content);
+      if (noteIndex !== -1) {
+        notes[noteIndex] = updatedNote;
+      }
+
+      localStorage.setItem('notes', JSON.stringify(notes));
+      localStorage.setItem('currentNote', JSON.stringify(updatedNote));
+
+      alert('Note saved!');
+    });
   </script>
 </body>
 </html>
