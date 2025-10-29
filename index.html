@@ -8,9 +8,9 @@
   <style>
     body {
       font-family: sans-serif;
-      background: #f5f5dc;
       margin: 0;
       padding: 0;
+      background: #f5f5dc;
     }
 
     header {
@@ -49,27 +49,45 @@
     }
 
     aside {
-      width: 150px;
+      width: 180px;
       background: #4F000B;
       color: #f5f5dc;
       padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
     }
 
-    aside ul {
+    #categoryList {
       list-style: none;
       padding: 0;
       margin: 0;
     }
 
-    aside li {
-      cursor: pointer;
+    #categoryList li {
       padding: 0.4rem;
-      border-radius: 4px;
       margin-bottom: 0.3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      border-radius: 4px;
     }
 
-    aside li.active, aside li:hover {
+    #categoryList li.active, #categoryList li:hover {
       background: #720026;
+    }
+
+    .deleteCatBtn {
+      background: #f5f5dc;
+      color: #720026;
+      border: none;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      font-size: 12px;
+      line-height: 16px;
+      cursor: pointer;
     }
 
     main {
@@ -112,6 +130,28 @@
       width: 20px;
       height: 20px;
       cursor: pointer;
+    }
+
+    .category-add {
+      margin-top: 1rem;
+      display: flex;
+      gap: 0.3rem;
+    }
+
+    .category-add input {
+      flex: 1;
+      border-radius: 4px;
+      border: 1px solid #f5f5dc;
+      padding: 0.3rem;
+    }
+
+    .category-add button {
+      background: #720026;
+      color: #f5f5dc;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      padding: 0.3rem 0.5rem;
     }
 
     /* Modal */
@@ -170,15 +210,12 @@
 
   <div class="container">
     <aside>
-      <ul id="categories">
-        <li class="active" data-category="all">All</li>
-        <li data-category="personal">Personal</li>
-        <li data-category="work">Work</li>
-        <li data-category="coding">Coding</li>
-        <li data-category="cooking">Cooking</li>
-      </ul>
+      <ul id="categoryList"></ul>
+      <div class="category-add">
+        <input type="text" id="newCategoryInput" placeholder="New category">
+        <button id="addCategoryBtn">Add</button>
+      </div>
     </aside>
-
     <main>
       <div id="notesList"></div>
     </main>
@@ -189,15 +226,14 @@
       <span class="close">&times;</span>
       <input type="text" id="noteTitle" placeholder="Title">
       <textarea id="noteContent" placeholder="Content"></textarea>
-      <select id="noteCategory">
-        <option value="personal">Personal</option>
-        <option value="work">Work</option>
-        <option value="coding">Coding</option>
-        <option value="cooking">Cooking</option>
-      </select>
+      <select id="noteCategory"></select>
       <button id="saveNoteBtn">Save</button>
     </div>
   </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
 
   <script src="script.js"></script>
 </body>
