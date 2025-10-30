@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
       li.textContent = cat;
       if (cat === activeCategory) li.classList.add("active");
 
-      // Delete button
+      // Delete button for categories except "Home"
       if (cat !== "Home") {
         const delBtn = document.createElement("button");
         delBtn.textContent = "×";
@@ -135,7 +135,7 @@ document.addEventListener("DOMContentLoaded", () => {
         `;
         notesList.appendChild(div);
 
-        // Edit note on click (go to note.html)
+        // Edit note on click
         div.addEventListener("click", e => {
           if (!e.target.classList.contains("deleteBtn")) {
             localStorage.setItem("currentNote", JSON.stringify({ ...note, index }));
