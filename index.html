@@ -1,218 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Notes</title>
-  <link rel="stylesheet" href="style.css">
-  <style>
-    body {
-      font-family: sans-serif;
-      margin: 0;
-      padding: 0;
-      background: #f5f5dc;
-    }
-
-    header {
-      background: #4F000B;
-      color: #f5f5dc;
-      padding: 1rem;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    header h1 {
-      flex: 1;
-      margin: 0;
-    }
-
-    header input {
-      padding: 0.4rem;
-      border-radius: 5px;
-      border: none;
-      flex: 2;
-    }
-
-    header div button {
-      padding: 0.4rem 0.8rem;
-      background: #720026;
-      color: #f5f5dc;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    header div button:hover {
-      background: #4F000B;
-    }
-
-    .container {
-      display: flex;
-      min-height: calc(100vh - 70px);
-    }
-
-    aside {
-      width: 180px;
-      background: #4F000B;
-      color: #f5f5dc;
-      padding: 1rem;
-      display: flex;
-      flex-direction: column;
-    }
-
-    #categoryList {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-
-    #categoryList li {
-      padding: 0.4rem;
-      margin-bottom: 0.3rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      cursor: pointer;
-      border-radius: 4px;
-    }
-
-    #categoryList li.active, #categoryList li:hover {
-      background: #720026;
-    }
-
-    .deleteCatBtn {
-      background: #f5f5dc;
-      color: #720026;
-      border: none;
-      border-radius: 50%;
-      width: 18px;
-      height: 18px;
-      font-size: 12px;
-      line-height: 16px;
-      cursor: pointer;
-    }
-
-    main {
-      flex: 1;
-      padding: 1rem;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-
-    .note {
-      background: #fff;
-      padding: 0.8rem;
-      border-radius: 5px;
-      border-left: 5px solid #4F000B;
-      width: 200px;
-      cursor: pointer;
-      position: relative;
-    }
-
-    .note h3 {
-      margin: 0 0 0.5rem 0;
-      color: #4F000B;
-    }
-
-    .note p {
-      margin: 0;
-      font-size: 0.9rem;
-      color: #333;
-    }
-
-    .deleteBtn {
-      position: absolute;
-      top: 5px;
-      right: 5px;
-      background: #720026;
-      color: #f5f5dc;
-      border: none;
-      border-radius: 50%;
-      width: 20px;
-      height: 20px;
-      cursor: pointer;
-    }
-
-    /* Modal */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5);
-      justify-content: center;
-      align-items: center;
-    }
-
-    .modal-content {
-      background: #f5f5dc;
-      padding: 1rem;
-      border-radius: 5px;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      width: 300px;
-      position: relative;
-    }
-
-    .modal-content input, .modal-content textarea, .modal-content select {
-      padding: 0.4rem;
-      border-radius: 4px;
-      border: 1px solid #4F000B;
-      width: 100%;
-    }
-
-    .modal-content button {
-      background: #4F000B;
-      color: #f5f5dc;
-      border: none;
-      padding: 0.5rem;
-      cursor: pointer;
-      border-radius: 5px;
-    }
-
-    .modal-content button:hover {
-      background: #720026;
-    }
-
-    .close {
-      position: absolute;
-      top: 10px;
-      right: 15px;
-      font-size: 1.2rem;
-      cursor: pointer;
-      color: #720026;
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sam’s Notes</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header>
-    <h1>My Notes</h1>
-    <input type="text" id="searchBar" placeholder="Search notes...">
-    <div>
-      <button id="addNoteBtn">+ Add Note</button>
-      <button id="addCategoryBtn">+ Add Category</button>
-    </div>
-  </header>
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <h2 class="sidebar-title">My Notes</h2>
+      <ul id="category-list" class="category-list"></ul>
 
-  <div class="container">
-    <aside>
-      <ul id="categoryList"></ul>
+      <div class="sidebar-buttons">
+        <button id="add-note-btn" class="btn">+ Add Note</button>
+        <button id="add-category-btn" class="btn">+ Add Category</button>
+      </div>
     </aside>
-    <main>
-      <div id="notesList"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="main-header">
+        <h1 id="current-category-title">Home</h1>
+      </header>
+
+      <div id="notes-container" class="notes-container"></div>
     </main>
   </div>
 
-  <div id="noteModal" class="modal">
+  <!-- Add/Edit Note Modal -->
+  <div id="note-modal" class="modal">
     <div class="modal-content">
-      <span class="close">&times;</span>
-      <input type="text" id="noteTitle" placeholder="Title">
-      <textarea id="noteContent" placeholder="Content"></textarea>
-      <select id="noteCategory"></select>
-      <button id="saveNoteBtn">Save Note</button>
+      <h2 id="modal-title">New Note</h2>
+      <input type="text" id="note-title-input" placeholder="Note title..." />
+      <textarea id="note-content-input" placeholder="Write your note here..."></textarea>
+      <div class="modal-actions">
+        <button id="save-note-btn" class="btn">Save</button>
+        <button id="cancel-note-btn" class="btn btn-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm Delete Modal -->
+  <div id="confirm-modal" class="modal">
+    <div class="modal-content">
+      <p id="confirm-message">Are you sure you want to delete this?</p>
+      <div class="modal-actions">
+        <button id="confirm-delete-btn" class="btn btn-danger">Yes</button>
+        <button id="cancel-delete-btn" class="btn btn-cancel">No</button>
+      </div>
     </div>
   </div>
 
