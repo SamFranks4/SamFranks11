@@ -1,166 +1,203 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const notesList = document.getElementById("notesList");
-  const addNoteBtn = document.getElementById("addNoteBtn");
-  const noteModal = document.getElementById("noteModal");
-  const closeModal = document.querySelector(".close");
-  const saveNoteBtn = document.getElementById("saveNoteBtn");
-  const noteTitle = document.getElementById("noteTitle");
-  const noteContent = document.getElementById("noteContent");
-  const noteCategorySelect = document.getElementById("noteCategory");
-  const searchBar = document.getElementById("searchBar");
-  const categoryListUL = document.getElementById("categoryList");
-  const newCategoryInput = document.getElementById("newCategoryInput");
-  const addCategoryBtn = document.getElementById("addCategoryBtn");
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Poppins", sans-serif;
+}
 
-  // LocalStorage Data
-  let notes = JSON.parse(localStorage.getItem("notes")) || [];
-  let categories = JSON.parse(localStorage.getItem("categories")) || ["Home"];
-  let activeCategory = "Home";
+body {
+  background-color: #f5f6fa;
+  color: #333;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
 
-  // === CATEGORY FUNCTIONS ===
-  function updateModalCategories() {
-    noteCategorySelect.innerHTML = "";
-    categories.forEach(cat => {
-      const opt = document.createElement("option");
-      opt.value = cat;
-      opt.textContent = cat;
-      noteCategorySelect.appendChild(opt);
-    });
-  }
+.app-container {
+  display: flex;
+  width: 95%;
+  height: 90vh;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
 
-  function renderCategories() {
-    categoryListUL.innerHTML = "";
-    categories.forEach(cat => {
-      const li = document.createElement("li");
-      li.textContent = cat;
-      if (cat === activeCategory) li.classList.add("active");
+/* Sidebar */
+.sidebar {
+  width: 250px;
+  background-color: #222;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 20px;
+}
 
-      // Delete button
-      if (cat !== "Home") {
-        const delBtn = document.createElement("button");
-        delBtn.textContent = "×";
-        delBtn.className = "deleteCatBtn";
-        delBtn.addEventListener("click", e => {
-          e.stopPropagation();
-          if (!confirm("Are you sure you want to delete this category?")) return;
+.sidebar-title {
+  font-size: 1.4em;
+  margin-bottom: 20px;
+  text-align: center;
+}
 
-          // Remove category
-          categories = categories.filter(c => c !== cat);
-          // Move notes in this category to Home
-          notes = notes.map(n => n.category === cat ? { ...n, category: "Home" } : n);
-          localStorage.setItem("categories", JSON.stringify(categories));
-          localStorage.setItem("notes", JSON.stringify(notes));
-          if (activeCategory === cat) activeCategory = "Home";
+.category-list {
+  list-style: none;
+  overflow-y: auto;
+  flex-grow: 1;
+}
 
-          renderCategories();
-          renderNotes();
-          updateModalCategories();
-        });
-        li.appendChild(delBtn);
-      }
+.category-item {
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  background-color: #333;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
-      li.addEventListener("click", () => {
-        activeCategory = cat;
-        renderCategories();
-        renderNotes();
-      });
+.category-item:hover,
+.category-item.active {
+  background-color: #444;
+}
 
-      categoryListUL.appendChild(li);
-    });
-  }
+.category-item span {
+  flex-grow: 1;
+}
 
-  function attachAddCategoryListener() {
-    addCategoryBtn.addEventListener("click", e => {
-      e.preventDefault();
-      const newCat = newCategoryInput.value.trim();
-      if (!newCat || categories.includes(newCat)) return;
-      categories.push(newCat);
-      localStorage.setItem("categories", JSON.stringify(categories));
-      newCategoryInput.value = "";
-      renderCategories();
-      updateModalCategories();
-    });
-  }
+.delete-category {
+  background: none;
+  border: none;
+  color: #aaa;
+  cursor: pointer;
+  font-size: 1em;
+}
 
-  // === NOTE FUNCTIONS ===
-  addNoteBtn.addEventListener("click", () => {
-    noteModal.style.display = "flex";
-    updateModalCategories();
-    noteCategorySelect.value = activeCategory;
-  });
+.delete-category:hover {
+  color: red;
+}
 
-  closeModal.addEventListener("click", () => {
-    noteModal.style.display = "none";
-  });
+.sidebar-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 15px;
+}
 
-  saveNoteBtn.addEventListener("click", () => {
-    const title = noteTitle.value.trim();
-    const content = noteContent.value.trim();
-    const category = noteCategorySelect.value;
+.btn {
+  background-color: #0078ff;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
 
-    if (!title && !content) return;
+.btn:hover {
+  background-color: #005fd1;
+}
 
-    const existingIndex = notes.findIndex(n => n.id && n.idEditing);
-    let note = { title, content, category, id: Date.now() };
+.btn-cancel {
+  background-color: #aaa;
+}
 
-    if (existingIndex !== -1) {
-      notes[existingIndex] = note;
-    } else {
-      notes.push(note);
-    }
+.btn-cancel:hover {
+  background-color: #888;
+}
 
-    localStorage.setItem("notes", JSON.stringify(notes));
-    renderNotes();
-    noteModal.style.display = "none";
-    noteTitle.value = "";
-    noteContent.value = "";
-  });
+.btn-danger {
+  background-color: #e74c3c;
+}
 
-  function renderNotes() {
-    const searchTerm = searchBar.value.toLowerCase();
-    notesList.innerHTML = "";
-    notes
-      .filter(
-        note =>
-          (activeCategory === "Home" || note.category === activeCategory) &&
-          (note.title.toLowerCase().includes(searchTerm) || note.content.toLowerCase().includes(searchTerm))
-      )
-      .forEach((note, index) => {
-        const div = document.createElement("div");
-        div.className = "note";
-        div.innerHTML = `
-          <h3>${note.title}</h3>
-          <p>${note.content}</p>
-          <button class="deleteBtn" data-index="${index}">×</button>
-        `;
-        notesList.appendChild(div);
+.btn-danger:hover {
+  background-color: #c0392b;
+}
 
-        // Edit note on click (go to note.html)
-        div.addEventListener("click", e => {
-          if (!e.target.classList.contains("deleteBtn")) {
-            localStorage.setItem("currentNote", JSON.stringify({ ...note, index }));
-            window.location.href = "note.html";
-          }
-        });
-      });
+/* Main content */
+.main-content {
+  flex-grow: 1;
+  padding: 25px;
+  background-color: white;
+  overflow-y: auto;
+}
 
-    // Delete buttons
-    document.querySelectorAll(".deleteBtn").forEach(btn => {
-      btn.addEventListener("click", e => {
-        const idx = e.target.dataset.index;
-        if (!confirm("Are you sure you want to delete this note?")) return;
-        notes.splice(idx, 1);
-        localStorage.setItem("notes", JSON.stringify(notes));
-        renderNotes();
-      });
-    });
-  }
+.main-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
 
-  searchBar.addEventListener("input", renderNotes);
-  window.addEventListener("focus", renderNotes);
+.notes-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 15px;
+}
 
-  renderCategories();
-  updateModalCategories();
-  renderNotes();
-  attachAddCategoryListener();
-});
+.note-card {
+  background-color: #f1f2f6;
+  border-radius: 12px;
+  padding: 15px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.note-card:hover {
+  background-color: #e0e1e5;
+  transform: translateY(-3px);
+}
+
+.note-card h3 {
+  margin-bottom: 10px;
+  font-size: 1.1em;
+}
+
+.note-card p {
+  font-size: 0.9em;
+  color: #555;
+}
+
+/* Modal */
+.modal {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal.active {
+  display: flex;
+}
+
+.modal-content {
+  background-color: white;
+  border-radius: 12px;
+  padding: 25px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.modal-content input,
+.modal-content textarea {
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 15px;
+  font-size: 1em;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
