@@ -1,203 +1,158 @@
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-family: "Poppins", sans-serif;
+// Load saved data
+let notes = JSON.parse(localStorage.getItem("notes")) || [];
+let categories = JSON.parse(localStorage.getItem("categories")) || ["Home"];
+let activeCategory = "Home";
+let deleteTarget = null;
+let deleteType = null;
+
+const categoryList = document.getElementById("category-list");
+const notesContainer = document.getElementById("notes-container");
+const addNoteBtn = document.getElementById("add-note-btn");
+const addCategoryBtn = document.getElementById("add-category-btn");
+
+const noteModal = document.getElementById("note-modal");
+const noteTitleInput = document.getElementById("note-title-input");
+const noteContentInput = document.getElementById("note-content-input");
+const saveNoteBtn = document.getElementById("save-note-btn");
+const cancelNoteBtn = document.getElementById("cancel-note-btn");
+
+const confirmModal = document.getElementById("confirm-modal");
+const confirmDeleteBtn = document.getElementById("confirm-delete-btn");
+const cancelDeleteBtn = document.getElementById("cancel-delete-btn");
+
+const categoryTitle = document.getElementById("current-category-title");
+
+let editingNoteId = null;
+
+// Render categories
+function renderCategories() {
+  categoryList.innerHTML = "";
+  categories.forEach(cat => {
+    const li = document.createElement("li");
+    li.textContent = cat;
+    if (cat === activeCategory) li.classList.add("active");
+    li.addEventListener("click", () => {
+      activeCategory = cat;
+      categoryTitle.textContent = cat;
+      renderCategories();
+      renderNotes();
+    });
+
+    if (cat !== "Home") {
+      const delBtn = document.createElement("button");
+      delBtn.textContent = "×";
+      delBtn.classList.add("delete-btn");
+      delBtn.addEventListener("click", e => {
+        e.stopPropagation();
+        deleteTarget = cat;
+        deleteType = "category";
+        confirmModal.style.display = "flex";
+      });
+      li.appendChild(delBtn);
+    }
+    categoryList.appendChild(li);
+  });
 }
 
-body {
-  background-color: #f5f6fa;
-  color: #333;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
+// Render notes
+function renderNotes() {
+  notesContainer.innerHTML = "";
+  const filtered = notes.filter(n => n.category === activeCategory || activeCategory === "Home");
+  filtered.forEach(note => {
+    const div = document.createElement("div");
+    div.classList.add("note-card");
+    div.innerHTML = `<h3>${note.title}</h3><p>${note.content.substring(0, 100)}</p>`;
+    div.addEventListener("click", () => openNoteEditor(note.id));
+
+    const delBtn = document.createElement("button");
+    delBtn.textContent = "×";
+    delBtn.classList.add("delete-btn");
+    delBtn.addEventListener("click", e => {
+      e.stopPropagation();
+      deleteTarget = note.id;
+      deleteType = "note";
+      confirmModal.style.display = "flex";
+    });
+
+    div.appendChild(delBtn);
+    notesContainer.appendChild(div);
+  });
 }
 
-.app-container {
-  display: flex;
-  width: 95%;
-  height: 90vh;
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+// Open modal for new or edit
+function openNoteEditor(id = null) {
+  noteModal.style.display = "flex";
+  if (id) {
+    const note = notes.find(n => n.id === id);
+    noteTitleInput.value = note.title;
+    noteContentInput.value = note.content;
+    editingNoteId = id;
+  } else {
+    noteTitleInput.value = "";
+    noteContentInput.value = "";
+    editingNoteId = null;
+  }
 }
 
-/* Sidebar */
-.sidebar {
-  width: 250px;
-  background-color: #222;
-  color: white;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 20px;
-}
+// Save note
+saveNoteBtn.addEventListener("click", () => {
+  const title = noteTitleInput.value.trim();
+  const content = noteContentInput.value.trim();
+  if (!title && !content) return;
 
-.sidebar-title {
-  font-size: 1.4em;
-  margin-bottom: 20px;
-  text-align: center;
-}
+  if (editingNoteId) {
+    const note = notes.find(n => n.id === editingNoteId);
+    note.title = title;
+    note.content = content;
+  } else {
+    notes.push({
+      id: Date.now(),
+      title,
+      content,
+      category: activeCategory
+    });
+  }
 
-.category-list {
-  list-style: none;
-  overflow-y: auto;
-  flex-grow: 1;
-}
+  localStorage.setItem("notes", JSON.stringify(notes));
+  renderNotes();
+  noteModal.style.display = "none";
+});
 
-.category-item {
-  padding: 10px;
-  border-radius: 8px;
-  margin-bottom: 8px;
-  background-color: #333;
-  cursor: pointer;
-  transition: background 0.2s;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+// Cancel modal
+cancelNoteBtn.addEventListener("click", () => (noteModal.style.display = "none"));
 
-.category-item:hover,
-.category-item.active {
-  background-color: #444;
-}
+// Add category
+addCategoryBtn.addEventListener("click", () => {
+  const name = prompt("Enter new category name:");
+  if (name && !categories.includes(name)) {
+    categories.push(name);
+    localStorage.setItem("categories", JSON.stringify(categories));
+    renderCategories();
+  }
+});
 
-.category-item span {
-  flex-grow: 1;
-}
+// Delete confirm modal actions
+confirmDeleteBtn.addEventListener("click", () => {
+  if (deleteType === "note") {
+    notes = notes.filter(n => n.id !== deleteTarget);
+    localStorage.setItem("notes", JSON.stringify(notes));
+  } else if (deleteType === "category") {
+    categories = categories.filter(c => c !== deleteTarget);
+    notes = notes.filter(n => n.category !== deleteTarget);
+    localStorage.setItem("categories", JSON.stringify(categories));
+    localStorage.setItem("notes", JSON.stringify(notes));
+    if (activeCategory === deleteTarget) activeCategory = "Home";
+  }
+  renderCategories();
+  renderNotes();
+  confirmModal.style.display = "none";
+});
 
-.delete-category {
-  background: none;
-  border: none;
-  color: #aaa;
-  cursor: pointer;
-  font-size: 1em;
-}
+cancelDeleteBtn.addEventListener("click", () => (confirmModal.style.display = "none"));
 
-.delete-category:hover {
-  color: red;
-}
+// Add note button
+addNoteBtn.addEventListener("click", () => openNoteEditor());
 
-.sidebar-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 15px;
-}
-
-.btn {
-  background-color: #0078ff;
-  color: white;
-  border: none;
-  padding: 10px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.btn:hover {
-  background-color: #005fd1;
-}
-
-.btn-cancel {
-  background-color: #aaa;
-}
-
-.btn-cancel:hover {
-  background-color: #888;
-}
-
-.btn-danger {
-  background-color: #e74c3c;
-}
-
-.btn-danger:hover {
-  background-color: #c0392b;
-}
-
-/* Main content */
-.main-content {
-  flex-grow: 1;
-  padding: 25px;
-  background-color: white;
-  overflow-y: auto;
-}
-
-.main-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.notes-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 15px;
-}
-
-.note-card {
-  background-color: #f1f2f6;
-  border-radius: 12px;
-  padding: 15px;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.note-card:hover {
-  background-color: #e0e1e5;
-  transform: translateY(-3px);
-}
-
-.note-card h3 {
-  margin-bottom: 10px;
-  font-size: 1.1em;
-}
-
-.note-card p {
-  font-size: 0.9em;
-  color: #555;
-}
-
-/* Modal */
-.modal {
-  position: fixed;
-  inset: 0;
-  background-color: rgba(0, 0, 0, 0.6);
-  display: none;
-  justify-content: center;
-  align-items: center;
-}
-
-.modal.active {
-  display: flex;
-}
-
-.modal-content {
-  background-color: white;
-  border-radius: 12px;
-  padding: 25px;
-  width: 90%;
-  max-width: 500px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-}
-
-.modal-content input,
-.modal-content textarea {
-  width: 100%;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 10px;
-  margin-bottom: 15px;
-  font-size: 1em;
-}
-
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-}
+// Initial render
+renderCategories();
+renderNotes();
