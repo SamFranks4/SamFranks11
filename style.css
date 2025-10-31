@@ -246,3 +246,32 @@ main {
   padding: 0.4rem 0.8rem;
   border-radius: 5px;
 }
+
+/* ===== HOMEPAGE NOTES UNIFORM STYLE ===== */
+main #notesList .note {
+  min-height: 140px; /* all notes same height */
+  border-left: 6px solid #720026; /* stronger accent */
+  background: #fff8f0; /* warmer background */
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1); /* subtle shadow */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+main #notesList .note h3 {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+
+main #notesList .note p {
+  font-size: 0.9rem;
+  line-height: 1.2rem;
+  color: #333;
+  flex-grow: 1;
+}
+
+main #notesList .note:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
