@@ -69,14 +69,21 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // ✅ Fixed Add Category Button
   function attachAddCategoryListener() {
-    addCategoryBtn.addEventListener("click", e => {
+    // Remove any existing listeners first to prevent duplicates
+    const newBtn = addCategoryBtn.cloneNode(true);
+    addCategoryBtn.parentNode.replaceChild(newBtn, addCategoryBtn);
+
+    newBtn.addEventListener("click", e => {
       e.preventDefault();
       const newCat = newCategoryInput.value.trim();
       if (!newCat || categories.includes(newCat)) return;
+
       categories.push(newCat);
       localStorage.setItem("categories", JSON.stringify(categories));
       newCategoryInput.value = "";
+
       renderCategories();
       updateModalCategories();
     });
